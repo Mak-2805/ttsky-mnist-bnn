@@ -10,13 +10,15 @@ module fsm(
     output logic [2:0] state
 );
 
-    typedef enum logic [2:0] {
-        s_IDLE    = 3'b000,
-        s_LOAD    = 3'b001,
-        s_LAYER_1 = 3'b010,
-        s_LAYER_2 = 3'b011,
-        s_LAYER_3 = 3'b100
-    } state_t;
+    // typedef enum logic [2:0] {
+    //     s_IDLE    = 3'b000,
+    //     s_LOAD    = 3'b001,
+    //     s_LAYER_1 = 3'b010,
+    //     s_LAYER_2 = 3'b011,
+    //     s_LAYER_3 = 3'b100
+    // } state_t;
+	
+	localparam s_IDLE = 3'b000, s_LOAD = 3'b001, s_LAYER_1 = 3'b010, s_LAYER_2 = 3'b011, s_LAYER_3 = 3'b100;
 	
   	// Current state, Next state
     logic [2:0] cs, ns;
@@ -80,7 +82,8 @@ module fsm(
         end
     end
 
-		assign state = cs;
+	// output state to tm
+	assign state = cs;
 
 endmodule
 

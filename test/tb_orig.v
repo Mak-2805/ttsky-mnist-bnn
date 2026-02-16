@@ -16,19 +16,19 @@ module tb ();
   // Wire up the inputs and outputs:
   reg clk;
   reg rst_n;
-  reg [2:0] state;
-  reg [27:0] pixels [27:0];
-  reg [2:0][2:0] weights [7:0];
-  wire [13:0] [13:0] layer_one_out [7:0];
-  wire done;
-
+  reg ena;
+  reg [7:0] ui_in;
+  reg [7:0] uio_in;
+  wire [7:0] uo_out;
+  wire [7:0] uio_out;
+  wire [7:0] uio_oe;
 `ifdef GL_TEST
   wire VPWR = 1'b1;
   wire VGND = 1'b0;
 `endif
 
   // Replace tt_um_example with your module name:
-  layer_one user_project (
+  tt_um_mnist_bnn user_project (
 
       // Include power ports for the Gate Level test:
 `ifdef GL_TEST
@@ -36,13 +36,14 @@ module tb ();
       .VGND(VGND),
 `endif
 
-      .clk  (clk),    // Dedicated inputs
-      .rst_n  (rst_n),   // Dedicated outputs
-      .state  (state),   // IOs: Input path
-      .pixels (pixels),  // IOs: Output path
-      .weights (weights),   // IOs: Enable path (active high: 0=input, 1=output)
-      .layer_one_out (layer_one_out),
-      .done (done)
+      .ui_in  (ui_in),    // Dedicated inputs
+      .uo_out (uo_out),   // Dedicated outputs
+      .uio_in (uio_in),   // IOs: Input path
+      .uio_out(uio_out),  // IOs: Output path
+      .uio_oe (uio_oe),   // IOs: Enable path (active high: 0=input, 1=output)
+      .ena    (ena),      // enable - goes high when design is selected
+      .clk    (clk),      // clock
+      .rst_n  (rst_n)     // not reset
   );
 
 endmodule

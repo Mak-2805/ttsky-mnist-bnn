@@ -34,6 +34,7 @@ module tt_um_mnist_bnn (
     
 logic mode;
 logic layer1_done, layer2_done, layer3_done;
+logic [2:0] state;
     
  fsm top_fsm ( 
      .clk(clk), 
@@ -43,8 +44,24 @@ logic layer1_done, layer2_done, layer3_done;
      .layer_1_done(ui_in[2]),
      .layer_2_done(ui_in[3]),
      .layer_3_done(ui_in[4]), 
-     .state(uo_out[2:0]) 
+     .state(state) 
  ); 
+
+    logic load = (state == 2'd1) ? 1'b1 : 1'b0;
+    
+    //set dimensions
+    //logic weights, pixels; 
+
+    // registers u0 (
+    //     .clk(clk),
+    //     .reset_n(rst_n)
+    //     .en_wr(load),
+    //     .d_in_p(),
+    //     .d_in_w(),
+    //     .pixels(),
+    //     .weights()
+    // );
+    
     
 
   // List all unused inputs to prevent warnings

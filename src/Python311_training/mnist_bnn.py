@@ -8,10 +8,10 @@ import struct
 
 # Need larq, tensorflow, tf_keras (for legacy support)
 
-images_training_filepath = "larq_env_311/training_data/mnist_binary_training.ubin"
-labels_training_filepath = "larq_env_311/training_data/mnist_binary_labels_training.ubin"
-images_verifying_filepath = "larq_env_311/training_data/mnist_binary_verifying.ubin"
-labels_verifying_filepath = "larq_env_311/training_data/mnist_binary_labels_verifying.ubin"
+images_training_filepath = "./src/Python311_training/training_data/mnist_binary_training.ubin"
+labels_training_filepath = "./src/Python311_training/training_data/mnist_binary_labels_training.ubin"
+images_verifying_filepath = "./src/Python311_training/training_data/mnist_binary_verifying.ubin"
+labels_verifying_filepath = "./src/Python311_training/training_data/mnist_binary_labels_verifying.ubin"
 
 
 with open(images_training_filepath, 'rb') as file:
@@ -44,7 +44,8 @@ with open(labels_verifying_filepath, 'rb') as file:
 
 kwargs = dict(input_quantizer="ste_sign",
               kernel_quantizer="ste_sign",
-              kernel_constraint="weight_clip")
+              kernel_constraint="weight_clip",
+              use_bias=False)
 
 #16,4
 model = tf.keras.models.Sequential()
@@ -66,11 +67,10 @@ model.add(tf.keras.layers.Activation("softmax"))
 
 model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 
-model.fit(training_images, training_labels, batch_size=64, epochs=10)
+model.fit(training_images, training_labels, batch_size=64, epochs=20)
 
 test_loss, test_acc = model.evaluate(verifying_images, verifying_labels)
 
 print(f"Test accuracy {test_acc * 100:.2f} %")
 
-
-#model.save("mnist_bnn_unconverted.h5")
+model.save("./src/Python311_training/mnist_bnn_unconverted.h5")

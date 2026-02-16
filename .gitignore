@@ -15,3 +15,4 @@ src/Python311_training/Include
 src/Python311_training/Lib
 src/Python311_training/Scripts
 src/Python311_training/pyvenv.cfg
+*.bak

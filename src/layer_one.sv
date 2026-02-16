@@ -82,8 +82,8 @@ module layer_one (
 
 
     Pseudo Code:
-
-    assign layer_
+    //Assign the normalization and max pooling
+    assign layer_one_out[weight_num][row][col] = $countones(conv(row, col, pixels, weights, weight_num)) | $countones(conv(row + 1, col, pixels, weights, weight_num)) | $countones(conv(row, col + 1, pixels, weights, weight_num)) | $countones(conv(row + 1, col + 1, pixels, weights, weight_num));
 
     function [8:0] conv;
         input logic [4:0] row, col;
@@ -101,7 +101,7 @@ module layer_one (
             assign bot_left = row == 27 & col == 0 ? 0 : pixel[row+1][col-1]
             assign bot_right = row == 27 & col == 27 ? 0 : pixel[row+1][col+1]
 
-            // Assign the convolution + norm
+            // Assign the convolution
             conv = {~(mid_left ^ weights[weight_num][row-1][col-1]), ~(mid_right ^ weights[weight_num][row][col+1]), ..., ~(pixels[row][col] ^ weights[weight_num][row][col]), ..., ~(bot_right ^ weights[weight_num][row+1][col+1])};
         end
     endfunction

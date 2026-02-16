@@ -47,7 +47,7 @@ logic [2:0] state;
      .state(state) 
  ); 
 
-    logic load = (state == 2'd1) ? 1'b1 : 1'b0;
+    logic load = (state == 3'd1) ? 1'b1 : 1'b0;
     
     //set dimensions
     //logic weights, pixels; 

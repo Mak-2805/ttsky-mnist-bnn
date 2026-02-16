@@ -1,4 +1,3 @@
-
 module layer_one (
     input logic clk, rst_n,
     input logic [2:0] state, // Top level input
@@ -20,8 +19,6 @@ module layer_one (
     logic [4:0] row, col;
     logic [3:0] weight_num;
 
-    logic comb0 [7:0], comb1, comb2, comb3;
-
     always_ff @(posedge clk) begin
         if (!rst_n) begin
             row <= 0;
@@ -32,10 +29,10 @@ module layer_one (
         else begin
             if (state == s_LAYER_1) begin
                 if (weight_num < 8) begin
-                    if (col < 27) begin
+                    if (col < 13) begin
                         col <= col + 1;
                     end else begin
-                        if (row < 27) begin
+                        if (row < 13) begin
                             row <= row + 1;
                             col <= 0;
                         end else begin
@@ -50,66 +47,53 @@ module layer_one (
             end
         end
     end
-    
-    logic [8:0] overlap;
-    logic i, j;
-    
 
+    // convolution + normalization + max pooling part
     always_comb begin
-            
-
+        // To Do: Add the different tresholding logic... alternate between 5 and 6
+        // Something feels fishy... what about when we're at [27, 27] for the pixels, then adding one for the convolution to row and col puts the center out of bound?? Not consistent with when we're at [0,0] for example..
+        layer_one_out[weight_num][row][col] = 
+            (($countones(conv(row, col, pixels, weights, weight_num)) >= 5) |
+             ($countones(conv(row, col + 1, pixels, weights, weight_num)) >= 5) |
+             ($countones(conv(row + 1, col, pixels, weights, weight_num)) >= 5) |
+             ($countones(conv(row + 1, col + 1, pixels, weights, weight_num)) >= 5));
     end
-    /*
 
 
-    Method 2: Pop Count
-    window0 [8:0] = {~(pixels[row-1][col-1] ^ weights[weight_num][row-1][col-1]), ..., ~(pixels[row+1][col+1] ^ weights[weight_num][row+1][col+1])};
-    window1 [8:0] = {~(pixels[row-1][col] ^ weights[weight_num][row-1][col]), ..., ~(pixels[row+1][col+2] ^ weights[weight_num][row+1][col+2])};
-    window2 [8:0] = {~(pixels[row][col-1] ^ weights[weight_num][row][col-1]), ..., ~(pixels[row+2][col+1] ^ weights[weight_num][row+2][col+1])};
-    window3 [8:0] = {~(pixels[row][col] ^ weights[weight_num][row][col]), ..., ~(pixels[row+2][col+2] ^ weights[weight_num][row+2][col+2])};
-
-    assign layer_one_out[weight_num][row][col] = $countones (window0[8:0]) | $countones (window1[8:0]) | $countones (window2[8:0]) | $countones (window3[8:0]);
-
-    Method 2: Adders
-    conv_norm_out_0 = ( ~(pixels[row-1][col-1] ^ weights[weight_num][row-1][col-1]) + ... + ~(pixels[row+1][col+1] ^ weights[weight_num][row+1][col+1]) ) >= thresh ? 1 : 0
-    conv_norm_out_1 = ( ~(pixels[row-1][col] ^ weights[weight_num][row-1][col]) + ... + ~(pixels[row+1][col+2] ^ weights[weight_num][row+1][col+2]) ) >= thresh ? 1 : 0
-    conv_norm_out_2 = ( ~(pixels[row][col-1] ^ weights[weight_num][row][col-1]) + ... + ~(pixels[row+2][col+1] ^ weights[weight_num][row+2][col+1]) ) >= thresh ? 1 : 0
-    conv_norm_out_3 = ( ~(pixels[row][col] ^ weights[weight_num][row][col]) + ... + ~(pixels[row+2][col+2] ^ weights[weight_num][row+2][col+2]) ) >= thresh ? 1 : 0
-
-    assign layer_one_out[weight_num][row][col] = conv_norm_out_0 | conv_norm_out_1 | conv_norm_out_2 | conv_norm_out_3;
-
-
-
-
-    Pseudo Code:
-    //Assign the normalization and max pooling
-    assign layer_one_out[weight_num][row][col] = $countones(conv(row, col, pixels, weights, weight_num)) | $countones(conv(row + 1, col, pixels, weights, weight_num)) | $countones(conv(row, col + 1, pixels, weights, weight_num)) | $countones(conv(row + 1, col + 1, pixels, weights, weight_num));
-
-    function [8:0] conv;
-        input logic [4:0] row, col;
-        input logic [27:0] pixels [27:0];
-        input logic [2:0][2:0] weights [7:0];
-        input logic [3:0] weight_num;
+    function logic [8:0] conv;
+        input logic [4:0] r, c; 
+        input logic [27:0] pix [27:0];
+        input logic [2:0][2:0] wts [7:0];
+        input logic [3:0] wt_num;
+        
+        logic top_left, top_mid, top_right, mid_left, mid_mid, mid_right, bot_left, bot_mid, bot_right;
+        
         begin
-        //assign all possible padded areas in the pixel matrix to either 0 or the pixel value
-            assign mid_left = col == 0 ? 0 : pixel[row][col-1]
-            assign mid_right = col == 27 ? 0 : pixel[row][col+1]
-            assign mid_up = row == 0 ? 0 : pixel[row-1][col]
-            assign mid_down = row == 27 ? pixel[row+1][col]
-            assign top_left =  row == 0 & col == 0 ? 0 : pixel[row-1][col-1]
-            assign top_right = row == 0 & col == 27 ? 0 : pixel[row-1][col+1]
-            assign bot_left = row == 27 & col == 0 ? 0 : pixel[row+1][col-1]
-            assign bot_right = row == 27 & col == 27 ? 0 : pixel[row+1][col+1]
-
-            // Assign the convolution
-            conv = {~(mid_left ^ weights[weight_num][row-1][col-1]), ~(mid_right ^ weights[weight_num][row][col+1]), ..., ~(pixels[row][col] ^ weights[weight_num][row][col]), ..., ~(bot_right ^ weights[weight_num][row+1][col+1])};
+            top_left  = (r == 0 && c == 0)  ? 1'b0 : pix[r-1][c-1];
+            top_mid   = (r == 0)            ? 1'b0 : pix[r-1][c];
+            top_right = (r == 0 && c == 27) ? 1'b0 : pix[r-1][c+1];
+            
+            mid_left  = (c == 0)  ? 1'b0 : pix[r][c-1];
+            mid_mid   = pix[r][c];
+            mid_right = (c == 27) ? 1'b0 : pix[r][c+1];
+            
+            bot_left  = (r == 27 && c == 0)  ? 1'b0 : pix[r+1][c-1];
+            bot_mid   = (r == 27)            ? 1'b0 : pix[r+1][c];
+            bot_right = (r == 27 && c == 27) ? 1'b0 : pix[r+1][c+1];
+            
+            conv = {
+                ~(top_left  ^ wts[wt_num][0][0]),
+                ~(top_mid   ^ wts[wt_num][0][1]),
+                ~(top_right ^ wts[wt_num][0][2]),
+                ~(mid_left  ^ wts[wt_num][1][0]),
+                ~(mid_mid   ^ wts[wt_num][1][1]),
+                ~(mid_right ^ wts[wt_num][1][2]),
+                ~(bot_left  ^ wts[wt_num][2][0]),
+                ~(bot_mid   ^ wts[wt_num][2][1]),
+                ~(bot_right ^ wts[wt_num][2][2])
+            };
         end
-    endfunction
-    
-    
-    */
 
+    endfunction
 
 endmodule
-
-

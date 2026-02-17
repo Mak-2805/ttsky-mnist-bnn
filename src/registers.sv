@@ -23,7 +23,8 @@ module registers(
         .sync_out_w(sync_out_weight)
     );
 
-    logic [9:0] count = 'd0;
+    logic [4:0] row = 'd0;
+    logic [4:0] col = 'd0;
     logic pic_done = 'd0;
     
     always_ff @ (posedge clk or negedge reset_n) begin
@@ -31,12 +32,16 @@ module registers(
             pixels = '{default:'0};
             pic_done <= 1'b0;
         end else if (reset_n && en_wr && ~pic_done) begin
-           pixels[count/28][count % 28] <= sync_out_pixel ;
-           if (count == 'b1100001111) begin
-               pic_done <= 'b1;
-               count <= 'd0;
+           pixels[row][col] <= sync_out_pixel;
+           if (col < 'd27) begin
+                col <= col + 1;
            end else begin
-               count <= count + 1;
+                col <= 'd0;
+                if (row < 'd27) begin
+                    row <= row + 1;
+                end else begin
+                    pic_done <= 1;
+                end
            end
         end 
     end
@@ -57,27 +62,27 @@ module registers(
             weights[level][trit][bitt] <= sync_out_weight;
             if (bitt < 2) begin
             // Still in the same row, move to next bit
-            bitt <= bitt + 1;
-        end else begin
-            // Current row is done, move back to bit 0
-            bitt <= 0;
-            if (trit < 2) begin
-                // Move to next row
-                trit <= trit + 1;
+                bitt <= bitt + 1;
             end else begin
-                // Next trit
-                trit <= 0;
-                if (level < 7) begin
-                    // Next vector
-                    level <= level + 1;
+            // Current row is done, move back to bit 0
+                bitt <= 0;
+                if (trit < 2) begin
+                    // Move to next row
+                    trit <= trit + 1;
                 end else begin
-                    // Full
-                    w_done <= 1;
+                    // Next trit
+                    trit <= 0;
+                    if (level < 7) begin
+                        // Next vector
+                        level <= level + 1;
+                    end else begin
+                        // Full
+                        w_done <= 1;
+                    end
                 end
             end
         end
-   end
-end
+    end
     
     assign load_done = (pic_done && w_done) ? 1'b1 : 1'b0; 
    

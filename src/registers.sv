@@ -27,7 +27,7 @@ module registers(
     logic [4:0] col = 'd0;
     logic pic_done = 'd0;
     
-    always_ff @ (posedge clk or negedge reset_n) begin
+    always_ff @ (posedge clk) begin
         if (!reset_n) begin 
             pixels = '{default:'0};
             pic_done <= 1'b0;
@@ -51,7 +51,7 @@ module registers(
     logic [2:0] level = 'd0;
     logic w_done = 'd0;
     
-    always_ff @ (posedge clk or negedge reset_n) begin
+    always_ff @ (posedge clk) begin
         if (~reset_n) begin
             weights = '{default:'0};
             w_done <= 'd0;

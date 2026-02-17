@@ -28,7 +28,7 @@ module registers(
     
     always_ff @ (posedge clk or negedge reset_n) begin
         if (!reset_n) begin 
-            for (int i = 0; i < 28; i++) pixels[i] = '{default:'0};
+            for (int i = 0; i < 28; i++) pixels = '{default:'0};
             pic_done <= 1'b0;
         end else if (reset_n && en_wr && ~pic_done) begin
            pixels[count/28][count % 28] <= sync_out_pixel ;
@@ -50,8 +50,8 @@ module registers(
         if (~reset_n) begin
             for (int i = 0; i < 8; i++)
                 for (int j = 0; j < 3; j++)
-                    weights[i][j] <= 'b0;
-                    w_done <= 0;
+                    weights = b0;
+                    w_done <= '{default:'0};
                     bitt <= 'd0;    
                     trit <= 'd0;
                     level <= 'd0;

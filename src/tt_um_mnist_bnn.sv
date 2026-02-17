@@ -56,7 +56,7 @@ module tt_um_mnist_bnn (
   ); 
     
   //set dimensions
-  logic pixels [0:27][0:27];
+  logic [27:0][27:0] pixels;
   logic [2:0][2:0] weights [0:7];
 
   logic load = (state == 3'd1) ? 1'b1 : 1'b0;

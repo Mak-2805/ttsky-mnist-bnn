@@ -6,7 +6,7 @@ module registers(
     input en_wr,
     input d_in_p,
     input d_in_w,
-    output logic [27:0] pixels [0:27],
+    output logic [27:0][27:0] pixels,
     output logic [2:0][2:0] weights [0:7],
     output logic load_done,
     );
@@ -29,7 +29,7 @@ module registers(
     
     always_ff @ (posedge clk) begin
         if (!reset_n) begin 
-            pixels = '{default:'0};
+            pixels <= '{default:'0};
             pic_done <= 1'b0;
         end else if (reset_n && en_wr && ~pic_done) begin
            pixels[row][col] <= sync_out_pixel;
@@ -53,7 +53,7 @@ module registers(
     
     always_ff @ (posedge clk) begin
         if (~reset_n) begin
-            weights = '{default:'0};
+            weights <= '{default:'0};
             w_done <= 'd0;
             bitt <= 'd0;    
             trit <= 'd0;

@@ -1,6 +1,5 @@
 module reset_pipe(
     input clk,
-    input reset_n,
     input logic async_in_rst,
     output logic sync_out_rst
     );

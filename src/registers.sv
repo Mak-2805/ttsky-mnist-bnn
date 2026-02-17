@@ -56,7 +56,7 @@ module registers(
                     trit <= 'd0;
                     level <= 'd0;
         end else if (~w_done && reset_n && en_wr) begin
-            weights[level][trit][bitt] <= 'd1;
+            weights[level][trit][bitt] <= sync_out_weight;
             if (bitt < 2) begin
             // Still in the same row, move to next bit
             bitt <= bitt + 1;

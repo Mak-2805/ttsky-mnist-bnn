@@ -4,9 +4,9 @@
 # defaults
 SIM ?= icarus
 FST ?= -fst # Use more efficient FST format
-TOPLEVEL_LANG ?= verilog
+TOPLEVEL_LANG ?= systemverilog
 SRC_DIR = $(PWD)/../src
-PROJECT_SOURCES = tt_um_mnist_bnn.v fsm.sv
+PROJECT_SOURCES = tt_um_mnist_bnn.sv fsm.sv pipe.sv registers.sv reset_pipe.sv
 
 ifneq ($(GATES),yes)
 

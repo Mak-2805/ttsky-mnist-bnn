@@ -16,3 +16,8 @@ src/Python311_training/Include
 src/Python311_training/Lib
 src/Python311_training/Scripts
 src/Python311_training/pyvenv.cfg
+
+# Ignore files generated from running tb through cognichip/make
+.cogni
+simulation_results
+test/*/obj_dir

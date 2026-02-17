@@ -1,0 +1,82 @@
+m255
+K4
+z2
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+Z0 dC:/Users/Robert/Documents/Codes/ttsky-mnist-bnn/test/flatten_layer_test
+vfinal_layer_combinational
+Z1 DXx6 sv_std 3 std 0 22 AD7iAPLo6nTIKk<N0eo=D3
+Z2 !s110 1771287474
+!i10b 1
+!s100 F:bhX7c47^LlmKWM]03I80
+ITGLK5fnozc4fnXScONDKc1
+Z3 VDg1SIo80bB@j0V0VzS_@n1
+Z4 !s105 flatten_layer_sv_unit
+S1
+R0
+Z5 w1771283328
+Z6 8./flatten_layer.sv
+Z7 F./flatten_layer.sv
+L0 1
+Z8 OV;L;10.5b;63
+r1
+!s85 0
+31
+Z9 !s108 1771287474.000000
+Z10 !s107 ./flatten_layer.sv|./tb_flatten_layer_test.sv|
+Z11 !s90 -reportprogress|300|-sv|./tb_flatten_layer_test.sv|./flatten_layer.sv|
+!i113 1
+o-sv
+Z12 tCvgOpt 0
+vfinal_layer_sequential
+R1
+R2
+!i10b 1
+!s100 UK`6O^_DQmU0Ia94RP<Ba3
+IN9bZ`:6HWUU3z=Kzkia6l2
+R3
+R4
+S1
+R0
+R5
+R6
+R7
+L0 31
+R8
+r1
+!s85 0
+31
+R9
+R10
+R11
+!i113 1
+o-sv
+R12
+vtb_final_layer_sequential
+R1
+R2
+!i10b 1
+!s100 ;_UhGK8KBK[L?chbPjiE11
+IY1T77MFQmAiGRY^RadeNC2
+R3
+!s105 tb_flatten_layer_test_sv_unit
+S1
+R0
+w1771287468
+8./tb_flatten_layer_test.sv
+F./tb_flatten_layer_test.sv
+L0 3
+R8
+r1
+!s85 0
+31
+R9
+R10
+R11
+!i113 1
+o-sv
+R12

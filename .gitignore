@@ -3,16 +3,22 @@
 *.vcd
 *.fst
 *.fst.hier
+*.gtkw
 runs
 tt_submission
 src/user_config.json
 src/config_merged.json
-test/sim_build
-test/__pycache__/
-test/results.xml
-test/gate_level_netlist.v
+test/*/sim_build
+test/*/__pycache__/
+test/*/results.xml
+test/*/gate_level_netlist.v
 src/Python311_training/Include
 src/Python311_training/Lib
 src/Python311_training/Scripts
 src/Python311_training/pyvenv.cfg
 *.bak
+
+# Ignore files generated from running tb through cognichip/make
+.cogni
+simulation_results
+test/*/obj_dir

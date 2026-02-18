@@ -9,11 +9,11 @@ import struct
 images_verifying_filepath = "./src/Python311_training/training_data/mnist_binary_verifying.ubin"
 labels_verifying_filepath = "./src/Python311_training/training_data/mnist_binary_labels_verifying.ubin"
 
-image_index_to_get = 2 # Index in MNIST data to test
-layer_to_get = 'quant_conv2d' # Layer name to read values from
-do_binarization = True # Binarize the output data
-channel_to_output = 5 # Channel of layer to output
-print_layer_weights = True # Print the binarized weights of layer_to_get
+image_index_to_get = 1 # Index in MNIST data to test
+layer_to_get = 'quant_dense' # Layer name to read values from
+do_binarization = False # Binarize the output data
+channel_to_output = 1 # Channel of layer to output
+print_layer_weights = False # Print the binarized weights of layer_to_get
 
 with open(images_verifying_filepath, 'rb') as file:
 	magic, size, rows, cols = struct.unpack(">IIII", file.read(16))
@@ -21,7 +21,7 @@ with open(images_verifying_filepath, 'rb') as file:
 		raise ValueError(f"Magic number incorrect, should be 2051, was {magic}")
 	verifying_image_data = np.frombuffer(file.read(), dtype=np.uint8)
 	verifying_image_data = np.unpackbits(verifying_image_data)
-	test_image = verifying_image_data[(image_index_to_get-1) * rows * cols:(image_index_to_get) * rows * cols].reshape(1, rows, cols)
+	test_image = verifying_image_data[(image_index_to_get) * rows * cols:(image_index_to_get + 1) * rows * cols].reshape(1, rows, cols)
 	print(test_image)
 
 def get_layer_weights(model, layer_name):
@@ -34,12 +34,18 @@ def get_layer_weights(model, layer_name):
 		layer_output = (layer_output > 0).astype(np.uint8)
 
 	print("------- Layer output -------")
-	print(layer_output[0][channel_to_output])
+	#print(f"{len(layer_output[0])}\'h{hex(int(''.join(map(str,layer_output[0])),2))[2:]}")
+	print(layer_output[0])
+
 	if print_layer_weights:
 		weights = ((model.get_layer(name=layer_name).get_weights()[0]) > 0).astype(np.uint8)
-		weights = np.transpose(weights, (3,0,1,2))
-		
-		print(f"channel weights: {weights[channel_to_output].flatten()}")
+		if len(weights.shape) == 4:
+				weights = np.transpose(weights, (3,0,1,2))
+		else:
+			weights = np.transpose(weights)
+		for channel_to_output in range(0, 10):
+			#print(f"channel {channel_to_output} weights: {len(weights[channel_to_output])}\'h{hex(int(''.join(map(str,weights[channel_to_output])),2))[2:]}")
+			print(f"channel {channel_to_output} weights: {''.join(map(str,weights[channel_to_output]))}")
 
 model_path = "./src/Python311_training/mnist_bnn_unconverted.h5"
 larq_custom_objects = {

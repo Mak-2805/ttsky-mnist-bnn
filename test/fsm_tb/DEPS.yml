@@ -1,0 +1,8 @@
+# DEPS configuration for FSM testbench simulation
+# All verification files for the FSM module are contained in this directory
+
+fsm_test:
+  deps:
+    - ../../src/fsm.sv
+    - tb_fsm.sv
+  top: tb_fsm

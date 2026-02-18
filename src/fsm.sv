@@ -1,4 +1,12 @@
 
+typedef enum logic [2:0] {
+    s_IDLE    = 3'b000,
+    s_LOAD    = 3'b001,
+    s_LAYER_1 = 3'b010,
+    s_LAYER_2 = 3'b011,
+    s_LAYER_3 = 3'b100
+} state_t;
+
 module fsm(
     input logic clk, // Top level input
     input logic rst_n, // Top level input
@@ -7,19 +15,11 @@ module fsm(
     input logic layer_1_done,
     input logic layer_2_done,
     input logic layer_3_done,
-    output logic [2:0] state
+    output state_t state
 );
-
-    typedef enum logic [2:0] {
-        s_IDLE    = 3'b000,
-        s_LOAD    = 3'b001,
-        s_LAYER_1 = 3'b010,
-        s_LAYER_2 = 3'b011,
-        s_LAYER_3 = 3'b100
-    } state_t;
 	
   	// Current state, Next state
-    logic [2:0] cs, ns;
+    state_t cs, ns;
     
     always_comb begin
     	case (cs)
@@ -67,7 +67,7 @@ module fsm(
         end
         
         default: begin 
-            cs = s_IDLE;
+            ns = s_IDLE;
         end
       endcase
     end

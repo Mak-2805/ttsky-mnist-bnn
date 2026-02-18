@@ -4,6 +4,8 @@ import tensorflow as tf
 import numpy as np
 import larq as lq
 
+output = False
+
 def extract_weights(model):
 	for i, layer in enumerate(model.layers):
 
@@ -17,11 +19,13 @@ def extract_weights(model):
 				binary_w = np.transpose(binary_w)
 		
 			filename = f"./src/Python311_training/weights/layer_{i}_weights.mem"
-			with open(filename, "w") as file:
-				for neuron_weights in binary_w:
-					bit_string = "".join(map(str, neuron_weights.flatten()))
-					file.write(f"{bit_string}\n")
+			if output:
+				with open(filename, "w") as file:
+					for neuron_weights in binary_w:
+						bit_string = "".join(map(str, neuron_weights.flatten()))
+						file.write(f"{bit_string}\n")
 			print(f"Created {filename} with shape {binary_w.shape}")
+			print(f"strides: {layer}")
 
 
 		if isinstance(layer, tf.keras.layers.BatchNormalization):
@@ -40,11 +44,13 @@ def extract_weights(model):
 				N = np.prod(prev.get_weights()[0].shape[:-1])
 				t_math = mean - (beta * np.sqrt(var + eps) / gamma)
 				t_hardware = np.ceil((t_math + N) / 2).astype(int)
+				print(f"Layer: {i}, n: {N} t_math: {t_math} t_hardware: {t_hardware}")
 
-				filename = f"./src/Python311_training/weights/layer_{i}_thresholds.mem"
-				with open(filename, 'w') as file:
-					for t in t_hardware:
-						file.write(f"{t:08b}\n")
+				if (output):
+					filename = f"./src/Python311_training/weights/layer_{i}_thresholds.mem"
+					with open(filename, 'w') as file:
+						for t in t_hardware:
+							file.write(f"{t:08b}\n")
 				print(f"Created {filename} (Thresholds for {prev.name})")
 
 model_path = "./src/Python311_training/mnist_bnn_unconverted.h5"

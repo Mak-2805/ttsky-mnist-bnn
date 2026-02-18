@@ -1,0 +1,13 @@
+# DEPS configuration for testbench simulations
+
+fsm_test:
+  deps:
+    - src/fsm.sv
+    - test/fsm_tb/tb_fsm.sv
+  top: tb_fsm
+
+layer_one_test:
+  deps:
+    - src/layer_one.sv
+    - test/layer_one_tb/tb_layer_one.sv
+  top: tb_layer_one

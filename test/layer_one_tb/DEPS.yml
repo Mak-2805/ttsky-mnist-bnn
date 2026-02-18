@@ -1,0 +1,8 @@
+# DEPS configuration for Layer One testbench simulation
+# All verification files for the layer_one module are contained in this directory
+
+layer_one_test:
+  deps:
+    - ../../src/layer_one.sv
+    - tb_layer_one.sv
+  top: tb_layer_one

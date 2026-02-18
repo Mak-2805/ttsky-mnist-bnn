@@ -68,28 +68,28 @@ module layer_one (
         logic top_left, top_mid, top_right, mid_left, mid_mid, mid_right, bot_left, bot_mid, bot_right;
         
         begin
-            top_left  = (r == 0 && c == 0)  ? 1'b0 : pix[r-1][c-1];
+            top_left  = (r == 0 || c == 0)  ? 1'b0 : pix[r-1][c-1];
             top_mid   = (r == 0)            ? 1'b0 : pix[r-1][c];
-            top_right = (r == 0 && c == 27) ? 1'b0 : pix[r-1][c+1];
+            top_right = (r == 0 || c == 27) ? 1'b0 : pix[r-1][c+1];
             
             mid_left  = (c == 0)  ? 1'b0 : pix[r][c-1];
             mid_mid   = pix[r][c];
             mid_right = (c == 27) ? 1'b0 : pix[r][c+1];
             
-            bot_left  = (r == 27 && c == 0)  ? 1'b0 : pix[r+1][c-1];
+            bot_left  = (r == 27 || c == 0)  ? 1'b0 : pix[r+1][c-1];
             bot_mid   = (r == 27)            ? 1'b0 : pix[r+1][c];
-            bot_right = (r == 27 && c == 27) ? 1'b0 : pix[r+1][c+1];
+            bot_right = (r == 27 || c == 27) ? 1'b0 : pix[r+1][c+1];
             
             conv = {
-                ~(top_left  ^ wts[wt_num][0][0]),
-                ~(top_mid   ^ wts[wt_num][0][1]),
-                ~(top_right ^ wts[wt_num][0][2]),
-                ~(mid_left  ^ wts[wt_num][1][0]),
-                ~(mid_mid   ^ wts[wt_num][1][1]),
-                ~(mid_right ^ wts[wt_num][1][2]),
-                ~(bot_left  ^ wts[wt_num][2][0]),
-                ~(bot_mid   ^ wts[wt_num][2][1]),
-                ~(bot_right ^ wts[wt_num][2][2])
+                ~(top_left  ^ wts[0][0][wt_num]),
+                ~(top_mid   ^ wts[0][1][wt_num]),
+                ~(top_right ^ wts[0][2][wt_num]),
+                ~(mid_left  ^ wts[1][0][wt_num]),
+                ~(mid_mid   ^ wts[1][1][wt_num]),
+                ~(mid_right ^ wts[1][2][wt_num]),
+                ~(bot_left  ^ wts[2][0][wt_num]),
+                ~(bot_mid   ^ wts[2][1][wt_num]),
+                ~(bot_right ^ wts[2][2][wt_num])
             };
         end
 

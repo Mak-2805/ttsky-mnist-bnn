@@ -1,0 +1,50 @@
+# Makefile for Layer One testbench using Icarus Verilog
+# Usage: make -f Makefile.iverilog
+
+# Paths
+SRC_DIR = ../../src
+TB_DIR = .
+
+# Files
+DUT = $(SRC_DIR)/layer_one.sv
+TB = $(TB_DIR)/tb_layer_one.sv
+
+# Output
+VVP = sim_layer_one.vvp
+WAVE = layer_one.fst
+
+.PHONY: all compile run clean view
+
+all: compile run
+
+compile:
+	@echo "Compiling with Icarus Verilog..."
+	iverilog -g2012 -o $(VVP) $(DUT) $(TB)
+
+run: compile
+	@echo "Running simulation..."
+	vvp $(VVP)
+	@echo ""
+	@echo "Simulation complete! Waveform saved to $(WAVE)"
+	@echo "To view waveforms: make view"
+
+view:
+	@echo "Opening waveform viewer..."
+	gtkwave $(WAVE) &
+
+clean:
+	@echo "Cleaning up..."
+	rm -f $(VVP) *.fst *.vcd *.log
+
+help:
+	@echo "Layer One Testbench Makefile (Icarus Verilog)"
+	@echo "=============================================="
+	@echo "make all     - Compile and run simulation"
+	@echo "make compile - Compile only"
+	@echo "make run     - Compile and run"
+	@echo "make view    - Open waveform viewer (GTKWave)"
+	@echo "make clean   - Remove generated files"
+	@echo ""
+	@echo "Requirements:"
+	@echo "  - Icarus Verilog (iverilog)"
+	@echo "  - GTKWave (waveform viewing)"

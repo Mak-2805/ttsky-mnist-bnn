@@ -1,0 +1,53 @@
+# Makefile for Layer One testbench using Verilator
+# Usage: make -f Makefile.verilator
+
+# Paths
+SRC_DIR = ../../src
+TB_DIR = .
+
+# Files
+DUT = $(SRC_DIR)/layer_one.sv
+TB = $(TB_DIR)/tb_layer_one.sv
+
+# Verilator flags
+VFLAGS = --binary --timing --trace-fst -Wall -Wno-fatal -Wno-TIMESCALEMOD
+
+# Output
+TOP = tb_layer_one
+EXEC = obj_dir/V$(TOP)
+
+.PHONY: all compile run clean view
+
+all: compile run
+
+compile:
+	@echo "Compiling with Verilator..."
+	verilator $(VFLAGS) --top-module $(TOP) $(DUT) $(TB)
+
+run: compile
+	@echo "Running simulation..."
+	$(EXEC)
+	@echo ""
+	@echo "Simulation complete! Waveform saved to layer_one.fst"
+	@echo "To view waveforms: make view"
+
+view:
+	@echo "Opening waveform viewer..."
+	gtkwave layer_one.fst &
+
+clean:
+	@echo "Cleaning up..."
+	rm -rf obj_dir *.fst *.vcd *.log
+
+help:
+	@echo "Layer One Testbench Makefile"
+	@echo "============================="
+	@echo "make all     - Compile and run simulation"
+	@echo "make compile - Compile only"
+	@echo "make run     - Compile and run"
+	@echo "make view    - Open waveform viewer (GTKWave)"
+	@echo "make clean   - Remove generated files"
+	@echo ""
+	@echo "Requirements:"
+	@echo "  - Verilator (simulation)"
+	@echo "  - GTKWave (waveform viewing)"

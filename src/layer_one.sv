@@ -52,10 +52,10 @@ module layer_one (
     // convolution + normalization + max pooling part
     always_comb begin
         layer_one_out[weight_num][row][col] = 
-            (($countones(conv(row << 1, col << 1, pixels, weights, weight_num)) >= 5 + (weights_num & 4'b1)) |
-             ($countones(conv(row << 1, (col << 1) + 1, pixels, weights, weight_num)) >= 5 + (weights_num & 4'b1)) |
-             ($countones(conv((row << 1) + 1, col << 1, pixels, weights, weight_num)) >= 5 + (weights_num & 4'b1)) |
-             ($countones(conv((row << 1) + 1, (col << 1) + 1, pixels, weights, weight_num)) >= 5 + (weights_num & 4'b1)));
+            (($countones(conv(row << 1, col << 1, pixels, weights, weight_num)) >= 5 + (weight_num & 4'b1)) |
+             ($countones(conv(row << 1, (col << 1) + 1, pixels, weights, weight_num)) >= 5 + (weight_num & 4'b1)) |
+             ($countones(conv((row << 1) + 1, col << 1, pixels, weights, weight_num)) >= 5 + (weight_num & 4'b1)) |
+             ($countones(conv((row << 1) + 1, (col << 1) + 1, pixels, weights, weight_num)) >= 5 + (weight_num & 4'b1)));
     end
 
 

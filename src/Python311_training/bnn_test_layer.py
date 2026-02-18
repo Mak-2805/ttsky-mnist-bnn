@@ -12,7 +12,8 @@ labels_verifying_filepath = "./src/Python311_training/training_data/mnist_binary
 image_index_to_get = 2 # Index in MNIST data to test
 layer_to_get = 'quant_conv2d' # Layer name to read values from
 do_binarization = True # Binarize the output data
-channel_to_output = 7 # Channel of layer to output
+channel_to_output = 5 # Channel of layer to output
+print_layer_weights = True # Print the binarized weights of layer_to_get
 
 with open(images_verifying_filepath, 'rb') as file:
 	magic, size, rows, cols = struct.unpack(">IIII", file.read(16))
@@ -32,7 +33,13 @@ def get_layer_weights(model, layer_name):
 	if (do_binarization):
 		layer_output = (layer_output > 0).astype(np.uint8)
 
+	print("------- Layer output -------")
 	print(layer_output[0][channel_to_output])
+	if print_layer_weights:
+		weights = ((model.get_layer(name=layer_name).get_weights()[0]) > 0).astype(np.uint8)
+		weights = np.transpose(weights, (3,0,1,2))
+		
+		print(f"channel weights: {weights[channel_to_output].flatten()}")
 
 model_path = "./src/Python311_training/mnist_bnn_unconverted.h5"
 larq_custom_objects = {

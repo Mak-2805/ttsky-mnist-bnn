@@ -51,12 +51,11 @@ module layer_one (
     // convolution + normalization + max pooling part
     always_comb begin
         // To Do: Add the different tresholding logic... alternate between 5 and 6
-        // Something feels fishy... what about when we're at [27, 27] for the pixels, then adding one for the convolution to row and col puts the center out of bound?? Not consistent with when we're at [0,0] for example..
         layer_one_out[weight_num][row][col] = 
-            (($countones(conv(row, col, pixels, weights, weight_num)) >= 5) |
-             ($countones(conv(row, col + 1, pixels, weights, weight_num)) >= 5) |
-             ($countones(conv(row + 1, col, pixels, weights, weight_num)) >= 5) |
-             ($countones(conv(row + 1, col + 1, pixels, weights, weight_num)) >= 5));
+            (($countones(conv(row << 1, col << 1, pixels, weights, weight_num)) >= 5) |
+             ($countones(conv(row << 1, (col << 1) + 1, pixels, weights, weight_num)) >= 5) |
+             ($countones(conv((row << 1) + 1, col << 1, pixels, weights, weight_num)) >= 5) |
+             ($countones(conv((row << 1) + 1, (col << 1) + 1, pixels, weights, weight_num)) >= 5));
     end
 
 

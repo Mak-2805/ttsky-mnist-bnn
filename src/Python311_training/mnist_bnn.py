@@ -67,10 +67,12 @@ model.add(tf.keras.layers.Activation("softmax"))
 
 model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 
-model.fit(training_images, training_labels, batch_size=64, epochs=20)
+model.fit(training_images, training_labels, batch_size=64, epochs=6)
 
 test_loss, test_acc = model.evaluate(verifying_images, verifying_labels)
 
+model.summary()
+
 print(f"Test accuracy {test_acc * 100:.2f} %")
 
-model.save("./src/Python311_training/mnist_bnn_unconverted.h5")
+#model.save("./src/Python311_training/mnist_bnn_unconverted.h5")

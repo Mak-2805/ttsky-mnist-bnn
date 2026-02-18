@@ -10,10 +10,10 @@ module layer_one (
     input logic clk, rst_n,
     input state_t state, // Top level input
 
-    input logic [27:0] pixels [27:0],
-    input logic [2:0][2:0] weights [7:0],
+    input logic [27:0][27:0] pixels,
+    input logic [2:0][2:0][7:0] weights,
 
-    output reg [13:0] [13:0] layer_one_out [7:0],
+    output reg [13:0][13:0][7:0] layer_one_out,
     output reg done
 );
     
@@ -61,8 +61,8 @@ module layer_one (
 
     function logic [8:0] conv;
         input logic [4:0] r, c; 
-        input logic [27:0] pix [27:0];
-        input logic [2:0][2:0] wts [7:0];
+        input logic [27:0][27:0] pix;
+        input logic [2:0][2:0][7:0] wts;
         input logic [3:0] wt_num;
         
         logic top_left, top_mid, top_right, mid_left, mid_mid, mid_right, bot_left, bot_mid, bot_right;

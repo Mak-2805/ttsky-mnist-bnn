@@ -7,12 +7,12 @@ module reset_pipe(
     //Reset Synchronizer
     /////////////////////////////////////////////////
   
-    logic sync_intermediate_rst;
+    logic sync_intermediate_rst = 1'b0;
 
     // Assert asynchronously
     // De-assert synchronously
-    always_ff @ (posedge clk or negedge reset_n) begin
-        if (!reset_n) begin
+    always_ff @ (posedge clk or negedge async_in_rst) begin
+        if (!async_in_rst) begin
             sync_intermediate_rst <= 'd0;
             sync_out_rst <= 'd0;
         end else begin

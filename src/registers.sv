@@ -8,10 +8,10 @@ module registers(
     input d_in_w,
     output logic [27:0][27:0] pixels,
     output logic [2:0][2:0] weights [0:7],
-    output logic load_done,
+    output logic load_done
     );
     
-    logic sync_out_pixel, sync_out_weight;
+    logic sync_out_pixel, sync_out_weight, sync_out_en;
     
     //add a pipeline stage before the filling up of registers
     pipe u0 (
@@ -19,8 +19,10 @@ module registers(
         .reset_n(reset_n),
         .async_in_p(d_in_p),
         .async_in_w(d_in_w),
+        .async_in_en(en_wr),
         .sync_out_p(sync_out_pixel),
-        .sync_out_w(sync_out_weight)
+        .sync_out_w(sync_out_weight),
+        .sync_out_en(sync_out_en)
     );
 
     logic [4:0] row = 'd0;
@@ -31,7 +33,9 @@ module registers(
         if (!reset_n) begin 
             pixels <= '{default:'0};
             pic_done <= 1'b0;
-        end else if (reset_n && en_wr && ~pic_done) begin
+            row <= 'd0;
+            col <= 'd0;
+        end else if (reset_n && sync_out_en && ~pic_done) begin
            pixels[row][col] <= sync_out_pixel;
            if (col < 'd27) begin
                 col <= col + 1;
@@ -58,7 +62,7 @@ module registers(
             bitt <= 'd0;    
             trit <= 'd0;
             level <= 'd0;
-        end else if (~w_done && reset_n && en_wr) begin
+        end else if (~w_done && reset_n && sync_out_en) begin
             weights[level][trit][bitt] <= sync_out_weight;
             if (bitt < 2) begin
             // Still in the same row, move to next bit

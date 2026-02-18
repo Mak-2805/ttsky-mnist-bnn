@@ -38,10 +38,10 @@ module tt_um_mnist_bnn (
 
   logic synchronous_reset;
 
-  reset_pipe u0 (
+  reset_pipe reset_in (
     .clk(clk),
     .async_in_rst(rst_n),
-    .sync_out_rst(synchronous_reset),
+    .sync_out_rst(synchronous_reset)
   );
 
   fsm top_fsm ( 

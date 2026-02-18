@@ -4,22 +4,36 @@ module final_layer_sequential #(parameter NUM_INPUTS = 196) (
 	input logic en,
 	input logic [NUM_INPUTS-1:0] data_in,
 	input logic [NUM_INPUTS-1:0] weights_in [9:0],
-	output logic [3:0] answer,
+	output logic [3:0] answer_reg = 0,
 	output logic layer_3_done
-
 	);
 	logic [7:0] popcount [9:0];
+	logic [7:0] next_popcount [9:0];
+	logic [NUM_INPUTS-1:0] xnor_result [9:0];
+	logic [3:0] answer;
 
 	// DOT PRODUCT LOGIC
-	always_ff @(posedge clock or negedge reset) begin
+
+	always_comb begin
+		for (int neuron = 0; neuron < 10; neuron++) begin
+			xnor_result[neuron] = weights_in[neuron] ^~ data_in;
+			next_popcount[neuron] = 0;
+			if (!layer_3_done) begin
+				for (int i = 0; i<NUM_INPUTS; i++) begin
+					next_popcount[neuron] = next_popcount[neuron] + xnor_result[neuron][i];
+				end
+			end
+		end
+	end
+
+	always_ff @(posedge clock or negedge reset or negedge en) begin
 		if (!reset | !en) begin
 			for (int i = 0; i < 10; i++) begin
 				popcount[i] <= 8'd0;
 			end
 		end else begin
-			for (int neuron = 0; neuron < 10; neuron++) begin
-				popcount[neuron] <= $countones(weights_in[neuron] ^~ data_in);
-			end
+			popcount <= next_popcount;
+			answer_reg <= answer;
 		end
 	end
 	

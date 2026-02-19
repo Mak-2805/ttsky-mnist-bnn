@@ -1,0 +1,59 @@
+Compiling with Icarus Verilog...
+iverilog -g2012 -o sim_layer_one_simple.vvp ../../src/layer_one.sv ./tb_layer_one_simple.sv
+Running simulation...
+vvp sim_layer_one_simple.vvp
+
+========================================
+Layer One Testbench
+========================================
+Testing with MNIST digit '2' (index 2)
+Input: 28x28 binary pixels
+Weights: 8 sets of 3x3 kernels
+Output: 8 feature maps of 14x14
+========================================
+
+VCD info: dumpfile layer_one.vcd opened for output.
+[20000] Reset released
+[40000] Starting LAYER_1 processing
+[15725000] Processing complete (done asserted)
+
+========================================
+Verifying Output Against Python Model
+========================================
+ERROR: Mismatch at weight=0, row=0, col=0
+  Expected: 0, Got: 1
+ERROR: Mismatch at weight=0, row=0, col=1
+  Expected: 0, Got: 1
+ERROR: Mismatch at weight=0, row=0, col=2
+  Expected: 0, Got: 1
+ERROR: Mismatch at weight=0, row=0, col=3
+  Expected: 0, Got: 1
+ERROR: Mismatch at weight=0, row=0, col=4
+  Expected: 0, Got: 1
+ERROR: Mismatch at weight=0, row=0, col=5
+  Expected: 0, Got: 1
+ERROR: Mismatch at weight=0, row=0, col=6
+  Expected: 0, Got: 1
+ERROR: Mismatch at weight=0, row=0, col=7
+  Expected: 0, Got: 1
+ERROR: Mismatch at weight=0, row=0, col=8
+  Expected: 0, Got: 1
+ERROR: Mismatch at weight=0, row=0, col=9
+  Expected: 0, Got: 1
+Weight 0: FAIL (149 mismatches)
+Weight 1: FAIL (174 mismatches)
+Weight 2: FAIL (195 mismatches)
+Weight 3: FAIL (213 mismatches)
+Weight 4: FAIL (387 mismatches)
+Weight 5: FAIL (550 mismatches)
+Weight 6: FAIL (707 mismatches)
+Weight 7: FAIL (728 mismatches)
+========================================
+*** TESTS FAILED ***
+Total errors: 728 / 1568
+========================================
+
+
+Simulation complete! Waveform saved to layer_one.vcd
+To view waveforms: make view
+make: *** No rule to make target '2'.  Stop.

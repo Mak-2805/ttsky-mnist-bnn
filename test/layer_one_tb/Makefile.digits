@@ -1,0 +1,57 @@
+# Makefile for Multiple Digit testbench using Icarus Verilog
+# Usage: make -f Makefile.digits
+
+# Paths
+SRC_DIR = ../../src
+TB_DIR = .
+
+# Files
+DUT = $(SRC_DIR)/layer_one.sv
+TB = $(TB_DIR)/tb_layer_one_digits.sv
+
+# Output
+VVP = sim_layer_one_digits.vvp
+WAVE = layer_one_digits.vcd
+
+# Library path for vvp (to fix missing libhistory.so.6)
+LIBDIR = $(HOME)/lib
+export LD_LIBRARY_PATH := $(LIBDIR):$(LD_LIBRARY_PATH)
+
+.PHONY: all compile run clean view
+
+all: compile run
+
+compile:
+	@echo "Compiling with Icarus Verilog..."
+	iverilog -g2012 -o $(VVP) $(DUT) $(TB)
+
+run: compile
+	@echo "Running simulation..."
+	vvp $(VVP)
+	@echo ""
+	@echo "Simulation complete! Waveform saved to $(WAVE)"
+	@echo "To view waveforms: make -f Makefile.digits view"
+
+view:
+	@echo "Opening waveform viewer..."
+	gtkwave $(WAVE) &
+
+clean:
+	@echo "Cleaning up..."
+	rm -f $(VVP) *.fst *.vcd *.log
+
+help:
+	@echo "Multiple Digit Testbench Makefile (Icarus Verilog)"
+	@echo "=================================================="
+	@echo "make -f Makefile.digits all     - Compile and run simulation"
+	@echo "make -f Makefile.digits compile - Compile only"
+	@echo "make -f Makefile.digits run     - Compile and run"
+	@echo "make -f Makefile.digits view    - Open waveform viewer (GTKWave)"
+	@echo "make -f Makefile.digits clean   - Remove generated files"
+	@echo "make -f Makefile.digits help    - Show this help message"
+	@echo ""
+	@echo "Files:"
+	@echo "  Testbench: tb_layer_one_digits.sv"
+	@echo "  Waveform:  layer_one_digits.vcd (VCD format)"
+	@echo ""
+	@echo "Tests: Digits 0, 1, 2, 5, 7"

@@ -8,13 +8,15 @@ TB_DIR = .
 # Files
 DUT = $(SRC_DIR)/layer_one.sv
 TB = $(TB_DIR)/tb_layer_one.sv
+CPP_TB = $(TB_DIR)/sim_main.cpp
 
 # Verilator flags
-VFLAGS = --binary --timing --trace-fst -Wall -Wno-fatal -Wno-TIMESCALEMOD
+VFLAGS = --cc --exe --trace-fst -Wall -Wno-fatal
 
 # Output
 TOP = tb_layer_one
 EXEC = obj_dir/V$(TOP)
+VERILATOR_ROOT = $(shell verilator --getenv VERILATOR_ROOT)
 
 .PHONY: all compile run clean view
 
@@ -22,7 +24,9 @@ all: compile run
 
 compile:
 	@echo "Compiling with Verilator..."
-	verilator $(VFLAGS) --top-module $(TOP) $(DUT) $(TB)
+	verilator $(VFLAGS) --top-module $(TOP) $(DUT) $(TB) $(CPP_TB)
+	@echo "Building executable..."
+	$(MAKE) -C obj_dir -f V$(TOP).mk
 
 run: compile
 	@echo "Running simulation..."

@@ -1,0 +1,113 @@
+Compiling digits testbench with Icarus Verilog...
+iverilog -g2012 -o sim_layer_one_digits.vvp ../../src/layer_one.sv ./tb_layer_one_digits.sv
+Running digits testbench...
+vvp sim_layer_one_digits.vvp
+VCD info: dumpfile layer_one.vcd opened for output.
+
+========================================
+Layer One Testbench - Multiple Digits
+========================================
+Testing MNIST-style digits: 0, 1, 2, 5, 7
+========================================
+
+
+****************************************
+TEST 1: Digit 0
+****************************************
+[20000] Reset released
+[40000] Starting LAYER_1 processing
+[15725000] Processing complete
+
+========================================
+Verifying Digit 0 Output
+========================================
+========================================
+*** DIGIT 0 PASSED ***
+All 1568 outputs match expected values
+========================================
+
+
+****************************************
+TEST 2: Digit 1
+****************************************
+[15845000] Reset released
+[15865000] Starting LAYER_1 processing
+[31545000] Processing complete
+
+========================================
+Verifying Digit 1 Output
+========================================
+========================================
+*** DIGIT 1 PASSED ***
+All 1568 outputs match expected values
+========================================
+
+
+****************************************
+TEST 3: Digit 2
+****************************************
+[31665000] Reset released
+[31685000] Starting LAYER_1 processing
+[47365000] Processing complete
+
+========================================
+Verifying Digit 2 Output
+========================================
+ERROR: Mismatch at weight=5, row=9, col=13 (idx=1119)
+  Expected: 1, Got: 0
+ERROR: Mismatch at weight=5, row=10, col=0 (idx=1120)
+  Expected: 1, Got: 0
+ERROR: Mismatch at weight=5, row=10, col=4 (idx=1124)
+  Expected: 1, Got: 0
+ERROR: Mismatch at weight=5, row=10, col=9 (idx=1129)
+  Expected: 0, Got: 1
+ERROR: Mismatch at weight=5, row=10, col=10 (idx=1130)
+  Expected: 0, Got: 1
+========================================
+*** DIGIT 2 FAILED ***
+Total errors: 80 / 1568
+========================================
+
+
+****************************************
+TEST 4: Digit 5
+****************************************
+[47485000] Reset released
+[47505000] Starting LAYER_1 processing
+[63185000] Processing complete
+
+========================================
+Verifying Digit 5 Output
+========================================
+========================================
+*** DIGIT 5 PASSED ***
+All 1568 outputs match expected values
+========================================
+
+
+****************************************
+TEST 5: Digit 7
+****************************************
+[63305000] Reset released
+[63325000] Starting LAYER_1 processing
+[79005000] Processing complete
+
+========================================
+Verifying Digit 7 Output
+========================================
+========================================
+*** DIGIT 7 PASSED ***
+All 1568 outputs match expected values
+========================================
+
+
+========================================
+FINAL TEST SUMMARY
+========================================
+*** SOME TESTS FAILED ***
+Total errors: 80 / 7840 checks
+========================================
+
+
+Simulation complete! Waveform saved to layer_one_digits.vcd
+To view waveforms: make -f Makefile.iverilog view-digits

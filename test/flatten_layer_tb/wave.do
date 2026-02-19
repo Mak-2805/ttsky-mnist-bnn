@@ -10,7 +10,7 @@ add wave -label next_popcount -noupdate -radix unsigned /tb_final_layer_sequenti
 add wave -label round_1 -noupdate -radix unsigned /tb_final_layer_sequential/dut/round_1_idx
 add wave -label round_2 -noupdate -radix unsigned /tb_final_layer_sequential/dut/round_2_idx
 add wave -label round_3 -noupdate -radix unsigned /tb_final_layer_sequential/dut/round_3_idx
-add wave -label answer -noupdate -radix unsigned /tb_final_layer_sequential/dut/answer_reg
+add wave -label answer -noupdate -radix unsigned /tb_final_layer_sequential/dut/answer
 add wave -label popcount -noupdate -radix unsigned /tb_final_layer_sequential/dut/popcount
 add wave -label layer_3_done -noupdate -radix unsigned /tb_final_layer_sequential/dut/layer_3_done
 

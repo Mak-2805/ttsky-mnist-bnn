@@ -18,7 +18,7 @@ module tb_final_layer_sequential;
 		.en(en),
 		.data_in(data_in),
 		.weights_in(weights_in),
-		.answer_reg(answer),
+		.answer(answer),
 		.layer_3_done(layer_done)
 	);
 
@@ -47,7 +47,7 @@ module tb_final_layer_sequential;
 		end
 		weights_in[4] = {NUM_INPUTS{1'b1}};
 		
-		@(negedge layer_done)
+		@(posedge layer_done)#1
 		$display("Test 1 - Expected: 4 | Got: %0d", answer);
 
 		// --- TEST 2 test tournament comparator ---
@@ -55,6 +55,10 @@ module tb_final_layer_sequential;
 		// en = 0;
 		// #5
 		// en = 1;
+
+		reset = 0;
+		#1
+		reset = 1;
 
 		data_in = {NUM_INPUTS{1'b1}};
 		for (int i = 0; i < 10; i++) begin
@@ -67,22 +71,28 @@ module tb_final_layer_sequential;
 			end
 		end
 
-		@(negedge layer_done)
+		@(posedge layer_done)#1
 		$display("Test 2 - Expected: 9 | Got: %0d", answer);
 
 		// --- Test 3 real data from Python model (image index 2)---
 
-		en = 0;
-		#11
-		en = 1;
+		// en = 0;
+		// #11
+		// en = 1;
+		reset = 0;
+		#1
+		reset = 1;
 
 		$readmemb("./current_test_case_values/layer_inputs.mem", test_images_inputs);
 		$readmemb("./current_test_case_values/layer_weights.mem", weights_in);
 		$readmemb("./current_test_case_values/label.mem", label);
 		data_in = test_images_inputs[0];
 
-		@(negedge layer_done) #3
+		@(posedge layer_done) #3
 		$display("Test 3 - Expected: %0d | Got: %0d", label[0], answer);
+		reset = 0;
+		#1
+		reset = 1;
 
 		$display("--- Tests Completed ---");
 		$stop;

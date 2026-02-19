@@ -34,15 +34,15 @@ o-sv
 Z8 tCvgOpt 0
 vfinal_layer_sequential
 R1
-Z9 !s110 1771452082
+Z9 !s110 1771464544
 !i10b 1
-!s100 :F4_iolE8?FL`Bj]]z`?J3
-ICSe@EHP;<45f>a_66BGhj3
+!s100 Rb^N:3D`?>0XY<O43:iJZ1
+IagH4TH<JIHWm4?1^U`hA;1
 R2
 R3
 S1
 Z10 dC:/Users/Robert/Documents/Codes/ttsky-mnist-bnn/test/flatten_layer_tb
-w1771451765
+w1771454890
 R4
 R5
 L0 1
@@ -50,7 +50,7 @@ R6
 r1
 !s85 0
 31
-Z11 !s108 1771452082.000000
+Z11 !s108 1771464544.000000
 Z12 !s107 ./flatten_layer.sv|./tb_flatten_layer_test.sv|
 R7
 !i113 1
@@ -60,13 +60,13 @@ vtb_final_layer_sequential
 R1
 R9
 !i10b 1
-!s100 aXKkQ5g3YgM@_I?]46mcC1
-Il6?:lX8AP3nTGGF5SHoko2
+!s100 iJTFgjkJoifGlYg=>fjTm2
+Io>5CW=b:mA2Zezi6jROO;3
 R2
 !s105 tb_flatten_layer_test_sv_unit
 S1
 R10
-w1771452080
+w1771464540
 8./tb_flatten_layer_test.sv
 F./tb_flatten_layer_test.sv
 L0 3

@@ -1,0 +1,40 @@
+# DEPS.yml for MNIST BNN Project
+
+tb_pipe:
+  deps:
+    - ttsky-mnist-bnn/src/pipe.sv
+    - ttsky-mnist-bnn/test/tb_pipe.sv
+  top: tb_pipe
+
+tb_reset_pipe:
+  deps:
+    - ttsky-mnist-bnn/src/reset_pipe.sv
+    - ttsky-mnist-bnn/test/tb_reset_pipe.sv
+  top: tb_reset_pipe
+
+tb_registers:
+  deps:
+    - ttsky-mnist-bnn/src/pipe.sv
+    - ttsky-mnist-bnn/src/registers.sv
+    - ttsky-mnist-bnn/test/tb_registers.sv
+  top: tb_registers
+
+tb_pipe_with_enable:
+  deps:
+    - ttsky-mnist-bnn/src/pipe.sv
+    - ttsky-mnist-bnn/test/tb_pipe_with_enable.sv
+  top: tb_pipe_with_enable
+
+tb_layer_one:
+  deps:
+    - ttsky-mnist-bnn/src/mnist_bnn_pkg.sv
+    - ttsky-mnist-bnn/src/layer_one_try.sv
+    - ttsky-mnist-bnn/test/tb_layer_one.sv
+  top: tb_layer_one
+
+tb_layer_one_comprehensive:
+  deps:
+    - ttsky-mnist-bnn/src/mnist_bnn_pkg.sv
+    - ttsky-mnist-bnn/src/layer_one_try.sv
+    - ttsky-mnist-bnn/test/tb_layer_one_comprehensive.sv
+  top: tb_layer_one_comprehensive

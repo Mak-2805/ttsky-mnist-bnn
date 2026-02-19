@@ -1,7 +1,12 @@
 `timescale 1ns/1ps
 
-import mnist_bnn_pkg::*;
-
+//  typedef enum logic [2:0] {
+//         s_IDLE    = 3'b000,
+//         s_LOAD    = 3'b001,
+//         s_LAYER_1 = 3'b010,
+//         s_LAYER_2 = 3'b011,
+//         s_LAYER_3 = 3'b100
+//     } state_t;
 module tb_layer_one;
 
     // Testbench signals
@@ -19,7 +24,7 @@ module tb_layer_one;
     integer i, j, k;
 
     // Instantiate DUT
-    layer_one dut (
+    layer_one_try dut (
         .clk(clock),
         .rst_n(reset),
         .state(state),
@@ -190,7 +195,7 @@ module tb_layer_one;
         // Create checkerboard pattern in pixels
         for (i = 0; i < 28; i++) begin
             for (j = 0; j < 28; j++) begin
-                pixels[i][j] = (i + j) % 2;
+                pixels[i][j] = (i + j) & 1'b1;
             end
         end
         
@@ -198,7 +203,7 @@ module tb_layer_one;
         for (i = 0; i < 8; i++) begin
             for (j = 0; j < 3; j++) begin
                 for (k = 0; k < 3; k++) begin
-                    weights[i][j][k] = (i + j + k) % 2;
+                    weights[i][j][k] = (i + j + k) & 1'b1;
                 end
             end
         end
@@ -259,7 +264,7 @@ module tb_layer_one;
         // Checkerboard pixels
         for (i = 0; i < 28; i++) begin
             for (j = 0; j < 28; j++) begin
-                pixels[i][j] = (i + j) % 2;
+                pixels[i][j] = (i + j) & 1'b1;
             end
         end
         
@@ -267,7 +272,7 @@ module tb_layer_one;
         for (i = 0; i < 8; i++) begin
             for (j = 0; j < 3; j++) begin
                 for (k = 0; k < 3; k++) begin
-                    weights[i][j][k] = ~((i + j + k) % 2);
+                    weights[i][j][k] = ~((i + j + k) & 1'b1);
                 end
             end
         end
@@ -292,7 +297,7 @@ module tb_layer_one;
         
         for (i = 0; i < 28; i++) begin
             for (j = 0; j < 28; j++) begin
-                pixels[i][j] = i % 2;  // Horizontal stripes
+                pixels[i][j] = i & 1'b1;  // Horizontal stripes
             end
         end
         
@@ -323,7 +328,7 @@ module tb_layer_one;
         
         for (i = 0; i < 28; i++) begin
             for (j = 0; j < 28; j++) begin
-                pixels[i][j] = j % 2;  // Vertical stripes
+                pixels[i][j] = j & 1'b1;  // Vertical stripes
             end
         end
         
@@ -358,7 +363,7 @@ module tb_layer_one;
                 if (i == 0 || i == 27 || j == 0 || j == 27) begin
                     pixels[i][j] = 1;
                 end else begin
-                    pixels[i][j] = (i + j) % 2;
+                    pixels[i][j] = (i + j) & 1'b1;
                 end
             end
         end
@@ -459,9 +464,9 @@ module tb_layer_one;
                 end else if (i < 14 && j >= 14) begin
                     pixels[i][j] = 1;  // Top-right: all ones
                 end else if (i >= 14 && j < 14) begin
-                    pixels[i][j] = (i + j) % 2;  // Bottom-left: checkerboard
+                    pixels[i][j] = (i + j) & 1'b1;  // Bottom-left: checkerboard
                 end else begin
-                    pixels[i][j] = ~((i + j) % 2);  // Bottom-right: inverted
+                    pixels[i][j] = ~((i + j) & 1'b1);  // Bottom-right: inverted
                 end
             end
         end
@@ -470,7 +475,7 @@ module tb_layer_one;
         for (i = 0; i < 8; i++) begin
             for (j = 0; j < 3; j++) begin
                 for (k = 0; k < 3; k++) begin
-                    weights[i][j][k] = (i + j + k) % 2;
+                    weights[i][j][k] = (i + j + k) & 1'b1;
                 end
             end
         end
@@ -527,14 +532,14 @@ module tb_layer_one;
         
         for (i = 0; i < 28; i++) begin
             for (j = 0; j < 28; j++) begin
-                pixels[i][j] = ((i / 2) + (j / 2)) % 2;  // 4x4 blocks
+                pixels[i][j] = ((i / 2) + (j / 2)) & 1'b1;  // 4x4 blocks
             end
         end
         
         for (i = 0; i < 8; i++) begin
             for (j = 0; j < 3; j++) begin
                 for (k = 0; k < 3; k++) begin
-                    weights[i][j][k] = ((i / 2) + j + k) % 2;
+                    weights[i][j][k] = ((i / 2) + j + k) & 1'b1;
                 end
             end
         end

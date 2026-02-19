@@ -245,6 +245,7 @@ module tb_layer_one;
     endfunction
     
     // Single convolution at a position
+    // FIXED VERSION: Matches RTL exactly
     function automatic logic conv_single(
         input int r, c, wt_num, threshold,
         input logic [27:0][27:0] pix,
@@ -256,7 +257,7 @@ module tb_layer_one;
         logic mid_left, mid_mid, mid_right;
         logic bot_left, bot_mid, bot_right;
         
-        // Handle edge cases (padding with 0)
+        // Handle edge cases (padding with 0) - MATCHES RTL
         top_left  = (r == 0 || c == 0)       ? 1'b0 : pix[r-1][c-1];
         top_mid   = (r == 0)                 ? 1'b0 : pix[r-1][c];
         top_right = (r == 0 || c == 27)     ? 1'b0 : pix[r-1][c+1];
@@ -269,23 +270,25 @@ module tb_layer_one;
         bot_mid   = (r == 27)                ? 1'b0 : pix[r+1][c];
         bot_right = (r == 27 || c == 27)    ? 1'b0 : pix[r+1][c+1];
         
-        // XNOR operation (match when pixel == weight)
+        // XNOR operation (match when pixel == weight) - MATCHES RTL
+        // Order MUST match RTL: wts[row][col][wt_num]
+        // Packed in SAME order as RTL from top-left to bottom-right
         conv_result = {
-            ~(top_left  ^ wts[wt_num][0][0]),
-            ~(top_mid   ^ wts[wt_num][0][1]),
-            ~(top_right ^ wts[wt_num][0][2]),
-            ~(mid_left  ^ wts[wt_num][1][0]),
-            ~(mid_mid   ^ wts[wt_num][1][1]),
-            ~(mid_right ^ wts[wt_num][1][2]),
-            ~(bot_left  ^ wts[wt_num][2][0]),
-            ~(bot_mid   ^ wts[wt_num][2][1]),
-            ~(bot_right ^ wts[wt_num][2][2])
+            ~(bot_right ^ wts[2][2][wt_num]),  // bit 8
+            ~(bot_mid   ^ wts[2][1][wt_num]),  // bit 7
+            ~(bot_left  ^ wts[2][0][wt_num]),  // bit 6
+            ~(mid_right ^ wts[1][2][wt_num]),  // bit 5
+            ~(mid_mid   ^ wts[1][1][wt_num]),  // bit 4
+            ~(mid_left  ^ wts[1][0][wt_num]),  // bit 3
+            ~(top_right ^ wts[0][2][wt_num]),  // bit 2
+            ~(top_mid   ^ wts[0][1][wt_num]),  // bit 1
+            ~(top_left  ^ wts[0][0][wt_num])   // bit 0
         };
         
-        // Count matches
+        // Count matches - MATCHES RTL
         match_count = $countones(conv_result);
         
-        // Apply threshold (batch normalization)
+        // Apply threshold (batch normalization) - MATCHES RTL
         return (match_count >= threshold);
     endfunction
     
@@ -530,7 +533,35 @@ module tb_layer_one;
         // Test 1: Checkerboard pattern
         run_layer_one_test("Checkerboard Pattern", TEST_PIXELS_1, TEST_WEIGHTS);
         
-        // Test 2: All zeros
+        // Test 2: All zeros - WITH DEBUG
+        $display("\n" + "="*60);
+        $display("DEBUG: All Zeros Test - Manual Calculation");
+        $display("="*60);
+        $display("Input: All pixels = 0");
+        $display("For each channel's 3x3 kernel:");
+        $display("  - XNOR(0, weight_bit) = 1 if weight_bit=0, else 0");
+        $display("  - Match count = number of 0s in kernel");
+        $display("  - Output = 1 if match_count >= threshold");
+        $display("\nTEST_WEIGHTS analysis:");
+        for (int ch = 0; ch < 8; ch++) begin
+            int zero_count = 0;
+            int threshold = 5 + (ch & 1);
+            logic expected_output;
+            
+            // Count zeros in this channel's kernel
+            for (int r = 0; r < 3; r++) begin
+                for (int c = 0; c < 3; c++) begin
+                    if (TEST_WEIGHTS[r][c][ch] == 0) zero_count++;
+                end
+            end
+            
+            expected_output = (zero_count >= threshold);
+            
+            $display("  Channel %0d: %0d zeros, threshold=%0d → expected=%0d", 
+                     ch, zero_count, threshold, expected_output);
+        end
+        $display("="*60 + "\n");
+        
         run_layer_one_test("All Zeros Input", TEST_PIXELS_2, TEST_WEIGHTS);
         
         // Test 3: All ones

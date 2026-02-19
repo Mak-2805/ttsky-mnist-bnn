@@ -44,12 +44,81 @@ module tb_layer_one;
     // Test case 3: All ones
     parameter logic [27:0][27:0] TEST_PIXELS_3 = '{default: 28'hFFFFFFF};
     
+    // Test case 4: Real MNIST digit from Python model (digit "2", index 2)
+    parameter logic [27:0][27:0] TEST_PIXELS_MNIST = {
+        28'b0000000000000000000000000000,  // row 0
+        28'b0000000000000000000000000000,  // row 1
+        28'b0000000000000000000000000000,  // row 2
+        28'b0000000000000000000000000000,  // row 3
+        28'b0000000000001111000000000000,  // row 4
+        28'b0000000011111111111000000000,  // row 5
+        28'b0000000011111111111100000000,  // row 6
+        28'b0000000000000000001110000000,  // row 7
+        28'b0000000000000000000110000000,  // row 8
+        28'b0000000000000000001100000000,  // row 9
+        28'b0000000000000111100000000000,  // row 10
+        28'b0000000000000001100000000000,  // row 11
+        28'b0000000111111110000000000000,  // row 12
+        28'b0000000111111100000000000000,  // row 13
+        28'b0000000111111000000000000000,  // row 14
+        28'b0000000000001110000000000000,  // row 15
+        28'b0000000000000110000000000000,  // row 16
+        28'b0000000000000011000000000000,  // row 17
+        28'b0000000000000011100000000000,  // row 18
+        28'b0000000000000011000000000000,  // row 19
+        28'b0000000000000011000000000000,  // row 20
+        28'b0000001111100011110000000000,  // row 21
+        28'b0000001111111111110000000000,  // row 22
+        28'b0000000111111111000000000000,  // row 23
+        28'b0000000000000000000000000000,  // row 24
+        28'b0000000000000000000000000000,  // row 25
+        28'b0000000000000000000000000000,  // row 26
+        28'b0000000000000000000000000000   // row 27
+    };
+    
     // Test weights - 8 different 3x3 binary kernels
     // Format: [row][col][weight_num]
     parameter logic [2:0][2:0][7:0] TEST_WEIGHTS = '{
         '{8'b10110001, 8'b01011110, 8'b10110001},  // row 0
         '{8'b11010101, 8'b00101010, 8'b11010101},  // row 1
         '{8'b10110001, 8'b01011110, 8'b10110001}   // row 2
+    };
+    
+    // Weights from Python model for MNIST test
+    // Each channel's 9 bits map to 3x3 kernel: [TL TM TR ML MM MR BL BM BR]
+    // channel 0: [0 0 0 1 1 0 1 1 0]
+    // channel 1: [1 0 0 1 0 1 1 1 1]
+    // channel 2: [0 0 0 1 1 1 0 1 1]
+    // channel 3: [1 1 1 1 1 0 0 0 0]
+    // channel 4: [0 1 1 0 0 0 0 0 0]
+    // channel 5: [1 1 1 0 0 0 0 0 0]
+    // channel 6: [1 1 1 0 0 0 0 0 0]
+    // channel 7: [1 0 1 1 1 1 0 0 0]
+    // Packed as [row][col][ch7 ch6 ch5 ch4 ch3 ch2 ch1 ch0]
+    parameter logic [2:0][2:0][7:0] TEST_WEIGHTS_MNIST = '{
+        '{8'b11101010, 8'b01111000, 8'b11111000},  // row 0: TL(bit0), TM(bit1), TR(bit2)
+        '{8'b10001111, 8'b10001101, 8'b10000110},  // row 1: ML(bit3), MM(bit4), MR(bit5)
+        '{8'b00000011, 8'b00000111, 8'b00000110}   // row 2: BL(bit6), BM(bit7), BR(bit8)
+    };
+    
+    // Expected outputs from Python model for MNIST test (Image Index 2)
+    // Generated from max_pooling2d layer output
+    // NOTE: Only channels 0-2 have activity for this image; channels 3-7 are all zeros
+    parameter logic [13:0][13:0][7:0] EXPECTED_OUTPUT_MNIST = '{
+        '{8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000},  // row 0
+        '{8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000, 8'b00000100, 8'b00000111, 8'b00000111, 8'b00000001, 8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000},  // row 1
+        '{8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000, 8'b00000110, 8'b00000111, 8'b00000111, 8'b00000111, 8'b00000111, 8'b00000111, 8'b00000001, 8'b00000000, 8'b00000000},  // row 2
+        '{8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000, 8'b11111000, 8'b11111000, 8'b11111000, 8'b11111000, 8'b11111100, 8'b10001111, 8'b00000111, 8'b00000000, 8'b00000000},  // row 3
+        '{8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000, 8'b00000110, 8'b00000111, 8'b00001101, 8'b11001011, 8'b00000000, 8'b00000000},  // row 4
+        '{8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000, 8'b00000100, 8'b00000111, 8'b00000111, 8'b00000111, 8'b00000110, 8'b11101111, 8'b11101000, 8'b01000000, 8'b00000000, 8'b00000000},  // row 5
+        '{8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000, 8'b00000110, 8'b00000111, 8'b00000111, 8'b10001111, 8'b11001111, 8'b01001000, 8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000},  // row 6
+        '{8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000, 8'b11111000, 8'b11111000, 8'b11111100, 8'b10001110, 8'b00000111, 8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000},  // row 7
+        '{8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000, 8'b01010000, 8'b11011000, 8'b00001111, 8'b00000111, 8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000},  // row 8
+        '{8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000, 8'b00000100, 8'b00001111, 8'b11001111, 8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000},  // row 9
+        '{8'b00000000, 8'b00000000, 8'b00000110, 8'b00000111, 8'b00000111, 8'b00000111, 8'b00000111, 8'b00000111, 8'b00001111, 8'b10001011, 8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000},  // row 10
+        '{8'b00000000, 8'b00000000, 8'b11010100, 8'b11001110, 8'b10001110, 8'b10001111, 8'b10001111, 8'b11001110, 8'b11001000, 8'b01000000, 8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000},  // row 11
+        '{8'b00000000, 8'b00000000, 8'b01010000, 8'b01111000, 8'b01111000, 8'b01111000, 8'b01111000, 8'b01111000, 8'b01000000, 8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000},  // row 12
+        '{8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000, 8'b00000000}   // row 13
     };
     
     // Expected outputs - Set these based on your test vectors
@@ -220,6 +289,132 @@ module tb_layer_one;
         return (match_count >= threshold);
     endfunction
     
+    // Run complete layer one test with exact expected outputs (for Python model validation)
+    task run_mnist_python_test(
+        input string test_name,
+        input logic [27:0][27:0] test_pixels,
+        input logic [2:0][2:0][7:0] test_weights,
+        input logic [13:0][13:0][7:0] expected_outputs
+    );
+        int mismatches;
+        logic expected_val;
+        
+        $display("\n==============================================");
+        $display("Running Test: %s", test_name);
+        $display("(Python Model Validation)");
+        $display("==============================================");
+        
+        // Setup test inputs
+        pixels = test_pixels;
+        weights = test_weights;
+        
+        // Apply reset
+        apply_reset();
+        
+        // Check done is not asserted initially
+        check_done(0);
+        
+        // Transition to LAYER_1 state
+        state = s_LAYER_1;
+        wait_clocks(1);
+        
+        $display("LOG: %0t : INFO : tb_layer_one : Starting layer one processing", $time);
+        
+        // Wait for processing to complete
+        cycle_count = 0;
+        while (!done && cycle_count < 2000) begin
+            @(posedge clk);
+            cycle_count++;
+        end
+        
+        if (cycle_count >= 2000) begin
+            $display("LOG: %0t : ERROR : tb_layer_one : Processing timeout after %0d cycles", 
+                     $time, cycle_count);
+            error_count++;
+        end else begin
+            $display("LOG: %0t : INFO : tb_layer_one : Processing completed in %0d cycles", 
+                     $time, cycle_count);
+        end
+        
+        // Check done signal is now asserted
+        check_done(1);
+        
+        // DEBUG: Print first few rows of actual RTL outputs in Python format
+        $display("\n====== DEBUG: RTL Outputs (Python format) ======");
+        for (int w = 0; w < 8; w++) begin
+            $display("\nChannel %0d RTL output:", w);
+            for (int r = 0; r < 3; r++) begin  // Show first 3 rows only
+                $write("[");
+                for (int c = 0; c < 14; c++) begin
+                    $write("%0d", layer_one_out[w][r][c]);
+                    if (c < 13) $write(" ");
+                end
+                $write("]");
+                if (r < 2) $write("\n ");
+            end
+            $display("");
+        end
+        
+        // DEBUG: Print expected outputs in same format (with reversed channel index)
+        $display("\n====== DEBUG: Expected Outputs (from Python) ======");
+        for (int w = 0; w < 8; w++) begin
+            $display("\nChannel %0d Expected (extracted from bit %0d):", w, w);
+            for (int r = 0; r < 3; r++) begin  // Show first 3 rows only
+                $write("[");
+                for (int c = 0; c < 14; c++) begin
+                    $write("%0d", expected_outputs[r][c][w]);
+                    if (c < 13) $write(" ");
+                end
+                $write("]");
+                if (r < 2) $write("\n ");
+            end
+            $display("");
+        end
+        $display("===============================================\n");
+        
+        // Verify outputs against Python model expected values
+        $display("Verifying outputs against Python model...");
+        mismatches = 0;
+        
+        for (int w = 0; w < 8; w++) begin
+            automatic int channel_mismatches = 0;
+            for (int r = 0; r < 14; r++) begin
+                for (int c = 0; c < 14; c++) begin
+                    expected_val = expected_outputs[r][c][w];  // Extract bit for this channel
+                    
+                    if (layer_one_out[w][r][c] !== expected_val) begin
+                        mismatches++;
+                        channel_mismatches++;
+                        if (mismatches <= 10) begin  // Only show first 10 mismatches
+                            $display("LOG: %0t : ERROR : tb_layer_one : layer_one_out[%0d][%0d][%0d] : expected_value: %b actual_value: %b",
+                                     $time, w, r, c, expected_val, layer_one_out[w][r][c]);
+                        end
+                    end
+                end
+            end
+            
+            if (channel_mismatches == 0) begin
+                $display("LOG: %0t : INFO : tb_layer_one : Channel %0d output verified successfully (matches Python model)", 
+                         $time, w);
+            end else begin
+                $display("LOG: %0t : ERROR : tb_layer_one : Channel %0d has %0d mismatches", 
+                         $time, w, channel_mismatches);
+            end
+        end
+        
+        if (mismatches > 0) begin
+            $display("\nLOG: %0t : ERROR : tb_layer_one : Total mismatches: %0d", $time, mismatches);
+            error_count++;
+        end else begin
+            $display("\nLOG: %0t : INFO : tb_layer_one : *** ALL OUTPUTS MATCH PYTHON MODEL EXACTLY! ***", $time);
+        end
+        
+        // Return to IDLE
+        state = s_IDLE;
+        wait_clocks(5);
+        
+    endtask
+    
     // Run complete layer one test
     task run_layer_one_test(
         input string test_name,
@@ -341,7 +536,13 @@ module tb_layer_one;
         // Test 3: All ones
         run_layer_one_test("All Ones Input", TEST_PIXELS_3, TEST_WEIGHTS);
         
-        // Test 4: State control - verify no processing in IDLE
+        // Test 4: Real MNIST digit from Python model
+        run_mnist_python_test("MNIST Digit (2) - Python Model", 
+                              TEST_PIXELS_MNIST, 
+                              TEST_WEIGHTS_MNIST, 
+                              EXPECTED_OUTPUT_MNIST);
+        
+        // Test 5: State control - verify no processing in IDLE
         $display("\n==============================================");
         $display("Test: State Control - IDLE state");
         $display("==============================================");

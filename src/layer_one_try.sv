@@ -1,22 +1,16 @@
- typedef enum logic [2:0] {
-        s_IDLE    = 3'b000,
-        s_LOAD    = 3'b001,
-        s_LAYER_1 = 3'b010,
-        s_LAYER_2 = 3'b011,
-        s_LAYER_3 = 3'b100
-    } state_t;
-
 module layer_one_try (
     input logic clk, rst_n,
-    input state_t state, // Top level input
+    input logic [2:0] state, // Top level input
 
     input logic [27:0][27:0] pixels,
-    input logic [7:0][2:0][2:0] weights,
+    input logic [2:0][2:0][7:0] weights,
 
-    output reg [7:0][13:0][13:0] layer_one_out,
+    output reg [13:0][13:0][7:0] layer_one_out,
     output reg done
 );
-    
+
+    localparam s_IDLE = 3'b000, s_LOAD = 3'b001, s_LAYER_1 = 3'b010, s_LAYER_2 = 3'b011, s_LAYER_3 = 3'b100;
+
     logic [4:0] row, col;
     logic [3:0] weight_num;
 

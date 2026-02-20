@@ -57,7 +57,9 @@ module tt_um_mnist_bnn (
     
   //set dimensions
   logic [27:0][27:0] pixels;
-  logic [2:0][2:0] weights [0:7];
+  logic [2:0][2:0][7:0] weights;
+  logic [13:0][13:0][7:0] layer_1_out;
+  logic [3:0][6:0][6:0] layer_2_out;
 
   logic load = (state == 3'd1) ? 1'b1 : 1'b0;
   registers u0 (
@@ -70,6 +72,49 @@ module tt_um_mnist_bnn (
     .weights(weights),
     .load_done(load_done)
   );
+
+
+  //Flop Stage (not trivial)
+  //Michael will try to cook this up
+  //Might not be necessary between memory fill-up and layer_one
+  //Stick to comb stages
+
+  layer_one_try u1(
+    .clk(clk),
+    .rst_n(synchronous_reset),
+    .state(state),
+    .pixels(pixels),
+    .weights(weights),
+    .layer_one_out(layer_1_out),
+    .done(layer1_done)
+  );
+
+  //Flop Stage (not trivial)
+  //Michael will try to cook this up
+
+  layer_two u2(
+    .clk(clk),
+    .rst_n(synchronous_reset),
+    .state(state),
+    .pixels(layer_1_out),
+    .weights(), //NEW WEIGHTS
+    .layer_two_out(layer_2_out),
+    .done(layer2_done)
+  );
+
+  //Flop Stage (not trivial)
+  //Michael will try to cook this up
+
+  flatten_layer u3 (
+    .clock(clk),
+	  .reset(rst_n),
+	  .data_in(layer_2_out),
+	  .weights_in(),
+	  .answer(uo_out[3:0])
+  );
+
+  //Flop Stage (not trivial)
+  //Michael will try to cook this up
     
   // List all unused inputs to prevent warnings
   wire _unused = &{ena,ui_in[7:3], 1'b0};

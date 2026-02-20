@@ -1,0 +1,98 @@
+Compiling simple testbench with Icarus Verilog...
+iverilog -g2012 -o sim_layer_one_simple.vvp ../../src/layer_one.sv ./tb_layer_one_simple.sv
+Running simple testbench...
+vvp sim_layer_one_simple.vvp
+
+========================================
+Layer One Testbench - Multiple Tests
+========================================
+Running 3 test cases:
+  1. All zeros
+  2. All ones
+  3. MNIST digit '3'
+========================================
+
+
+****************************************
+TEST 1: All Zeros Pattern
+****************************************
+VCD info: dumpfile layer_one.vcd opened for output.
+[20000] Reset released
+[40000] Starting LAYER_1 processing
+[15725000] Processing complete (done asserted)
+
+========================================
+Verifying Output Against Python Model
+========================================
+Weight 0: PASS (all 196 outputs correct)
+Weight 1: PASS (all 196 outputs correct)
+Weight 2: PASS (all 196 outputs correct)
+Weight 3: PASS (all 196 outputs correct)
+Weight 4: PASS (all 196 outputs correct)
+Weight 5: PASS (all 196 outputs correct)
+Weight 6: PASS (all 196 outputs correct)
+Weight 7: PASS (all 196 outputs correct)
+========================================
+*** TEST PASSED ***
+All 1568 outputs match expected values
+========================================
+
+
+****************************************
+TEST 2: All Ones Pattern
+****************************************
+[15845000] Reset released
+[15865000] Starting LAYER_1 processing
+[31545000] Processing complete (done asserted)
+
+========================================
+Verifying Output Against Python Model
+========================================
+Weight 0: PASS (all 196 outputs correct)
+Weight 1: PASS (all 196 outputs correct)
+Weight 2: PASS (all 196 outputs correct)
+Weight 3: PASS (all 196 outputs correct)
+Weight 4: PASS (all 196 outputs correct)
+Weight 5: PASS (all 196 outputs correct)
+Weight 6: PASS (all 196 outputs correct)
+Weight 7: PASS (all 196 outputs correct)
+========================================
+*** TEST PASSED ***
+All 1568 outputs match expected values
+========================================
+
+
+****************************************
+TEST 3: MNIST Digit '3'
+****************************************
+[31665000] Reset released
+[31685000] Starting LAYER_1 processing
+[47365000] Processing complete (done asserted)
+
+========================================
+Verifying Output Against Python Model
+========================================
+Weight 0: PASS (all 196 outputs correct)
+Weight 1: PASS (all 196 outputs correct)
+Weight 2: PASS (all 196 outputs correct)
+Weight 3: PASS (all 196 outputs correct)
+Weight 4: PASS (all 196 outputs correct)
+Weight 5: PASS (all 196 outputs correct)
+Weight 6: PASS (all 196 outputs correct)
+Weight 7: PASS (all 196 outputs correct)
+========================================
+*** TEST PASSED ***
+All 1568 outputs match expected values
+========================================
+
+
+========================================
+FINAL TEST SUMMARY
+========================================
+*** ALL TESTS PASSED ***
+Total checks: 4704
+========================================
+
+
+Simulation complete! Waveform saved to layer_one.vcd
+To view waveforms: make -f Makefile.iverilog view

@@ -1,0 +1,94 @@
+# Makefile for Layer One testbench using Icarus Verilog
+# Usage: make -f Makefile.iverilog [target]
+
+# Paths
+SRC_DIR = ../../src
+TB_DIR = .
+
+# Files
+DUT = $(SRC_DIR)/layer_one.sv
+TB_SIMPLE = $(TB_DIR)/tb_layer_one_simple.sv
+TB_DIGITS = $(TB_DIR)/tb_layer_one_digits.sv
+
+# Output files
+VVP_SIMPLE = sim_layer_one_simple.vvp
+VVP_DIGITS = sim_layer_one_digits.vvp
+WAVE_SIMPLE = layer_one.vcd
+WAVE_DIGITS = layer_one_digits.vcd
+
+# Library path for vvp (to fix missing libhistory.so.6)
+LIBDIR = $(HOME)/lib
+export LD_LIBRARY_PATH := $(LIBDIR):$(LD_LIBRARY_PATH)
+
+.PHONY: all simple digits compile-simple compile-digits run-simple run-digits clean view view-digits help
+
+# Default target runs simple testbench
+all: simple
+
+# Simple testbench (3 test cases: all zeros, all ones, MNIST digit '3')
+simple: compile-simple run-simple
+
+compile-simple:
+	@echo "Compiling simple testbench with Icarus Verilog..."
+	iverilog -g2012 -o $(VVP_SIMPLE) $(DUT) $(TB_SIMPLE)
+
+run-simple: compile-simple
+	@echo "Running simple testbench..."
+	vvp $(VVP_SIMPLE)
+	@echo ""
+	@echo "Simulation complete! Waveform saved to $(WAVE_SIMPLE)"
+	@echo "To view waveforms: make -f Makefile.iverilog view"
+
+# Digits testbench (5 test cases: digits 0, 1, 2, 5, 7)
+digits: compile-digits run-digits
+
+compile-digits:
+	@echo "Compiling digits testbench with Icarus Verilog..."
+	iverilog -g2012 -o $(VVP_DIGITS) $(DUT) $(TB_DIGITS)
+
+run-digits: compile-digits
+	@echo "Running digits testbench..."
+	vvp $(VVP_DIGITS)
+	@echo ""
+	@echo "Simulation complete! Waveform saved to $(WAVE_DIGITS)"
+	@echo "To view waveforms: make -f Makefile.iverilog view-digits"
+
+view:
+	@echo "Opening simple testbench waveform viewer..."
+	gtkwave $(WAVE_SIMPLE) &
+
+view-digits:
+	@echo "Opening digits testbench waveform viewer..."
+	gtkwave $(WAVE_DIGITS) &
+
+clean:
+	@echo "Cleaning up..."
+	rm -f $(VVP_SIMPLE) $(VVP_DIGITS) *.fst *.vcd *.log
+
+help:
+	@echo "Layer One Testbench Makefile (Icarus Verilog)"
+	@echo "=============================================="
+	@echo ""
+	@echo "Targets:"
+	@echo "  make -f Makefile.iverilog [all|simple]  - Run simple testbench (default)"
+	@echo "  make -f Makefile.iverilog digits        - Run digits testbench"
+	@echo "  make -f Makefile.iverilog view          - View simple testbench waveforms"
+	@echo "  make -f Makefile.iverilog view-digits   - View digits testbench waveforms"
+	@echo "  make -f Makefile.iverilog clean         - Remove all generated files"
+	@echo "  make -f Makefile.iverilog help          - Show this help message"
+	@echo ""
+	@echo "Simple Testbench (3 tests):"
+	@echo "  - All zeros pattern"
+	@echo "  - All ones pattern"
+	@echo "  - MNIST digit '3'"
+	@echo "  File: tb_layer_one_simple.sv"
+	@echo "  Waveform: layer_one.vcd"
+	@echo ""
+	@echo "Digits Testbench (5 tests):"
+	@echo "  - MNIST-style digits: 0, 1, 2, 5, 7"
+	@echo "  File: tb_layer_one_digits.sv"
+	@echo "  Waveform: layer_one_digits.vcd"
+	@echo ""
+	@echo "Requirements:"
+	@echo "  - Icarus Verilog (iverilog) version 10.2+"
+	@echo "  - GTKWave (for waveform viewing)"

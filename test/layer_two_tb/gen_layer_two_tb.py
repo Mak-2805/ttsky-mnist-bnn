@@ -101,6 +101,31 @@ def load_labels():
 
 def run_layer_one(pixels_28x28, l1_weights, l1_thresh):
     """Returns feature map shape (14, 14, 8) — [row][col][channel]"""
+
+    conv_raw = np.zeros((28,28,8), dtype=int)
+    for k in range(8):
+        for r in range(28):
+            for c in range(28):
+                matches = 0
+                for kr in range(3):
+                    for kc in range(3):
+                        rr = r + kr - 1
+                        cc = c + kc - 1
+                        pv = 0 if (rr < 0 or rr >= 28 or cc < 0 or cc >= 28) else int(pixels_28x28[rr, cc])
+                        if pv == l1_weights[k, kr, kc]:
+                            matches += 1
+                        
+                conv_raw[r, c, k] = matches
+    print("  Layer 1 raw convolution output output")
+    # for k in range(8):
+    #     print(conv_raw.pri)
+    #     print(f"    Channel {k}")
+    #     for r in range(28):
+    #         print("      " + "".join(str(conv_raw[r,c,k] for c in range(28))))
+    for channel, output in enumerate(conv_raw):
+        print(channel)
+        print(output)
+
     out = np.zeros((14, 14, 8), dtype=int)
     for k in range(8):
         thresh = l1_thresh[k]
@@ -222,17 +247,26 @@ labels = load_labels()
 w_sv = weights_to_sv(hw_l2)
 
 test_cases = []
-for i in range(NUM_IMAGES):
-    feat = run_layer_one(images[i], l1_weights, l1_thresh)
-    expected = run_layer_two(feat, hw_l2, l2_thresh)
-    test_cases.append({
-        'index':    i,
-        'label':    int(labels[i]),
-        'pix_sv':   pixels_to_sv(feat),
-        'exp_sv':   output_to_sv(expected),
-        'active':   int(np.sum(expected)),
-    })
-    print(f"  Image {i}: label={int(labels[i])}, active={int(np.sum(expected))}/196")
+image_sel = 1
+# for image in images[image_sel]:
+print("image:")
+print(images[image_sel])
+
+
+feat = run_layer_one(images[image_sel], l1_weights, l1_thresh)
+expected = run_layer_two(feat, hw_l2, l2_thresh)
+print("expected:")
+for index, output in enumerate(expected):
+    print(f"channel {index+1}")
+    print(output)
+test_cases.append({
+    'index':    image_sel,
+    'label':    int(labels[image_sel]),
+    'pix_sv':   pixels_to_sv(feat),
+    'exp_sv':   output_to_sv(expected),
+    'active':   int(np.sum(expected)),
+})
+print(f"  Image {image_sel}: label={int(labels[image_sel])}, active={int(np.sum(expected))}/196")
 
 # ---- Write testbench -------------------------------------------------
 

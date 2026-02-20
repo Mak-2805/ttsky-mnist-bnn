@@ -34,15 +34,15 @@ o-sv
 Z8 tCvgOpt 0
 vfinal_layer_sequential
 R1
-Z9 !s110 1771464544
+Z9 !s110 1771613287
 !i10b 1
-!s100 Rb^N:3D`?>0XY<O43:iJZ1
-IagH4TH<JIHWm4?1^U`hA;1
+!s100 _lW=LCgRMzPHggCm6IfjE3
+IM8F7U^^[F?>[2XSAS8Xie0
 R2
 R3
 S1
-Z10 dC:/Users/Robert/Documents/Codes/ttsky-mnist-bnn/test/flatten_layer_tb
-w1771454890
+Z10 dC:/Users/rzupanci/Documents/Projects/BinaryNeuralNetwork/ttsky-mnist-bnn/test/flatten_layer_tb
+w1771612984
 R4
 R5
 L0 1
@@ -50,7 +50,7 @@ R6
 r1
 !s85 0
 31
-Z11 !s108 1771464544.000000
+Z11 !s108 1771613287.000000
 Z12 !s107 ./flatten_layer.sv|./tb_flatten_layer_test.sv|
 R7
 !i113 1
@@ -60,13 +60,13 @@ vtb_final_layer_sequential
 R1
 R9
 !i10b 1
-!s100 iJTFgjkJoifGlYg=>fjTm2
-Io>5CW=b:mA2Zezi6jROO;3
+!s100 Edkm4dbliM1?N;UJhM;C52
+Ilb]EPmeeEdZ619a>;c=Oc2
 R2
 !s105 tb_flatten_layer_test_sv_unit
 S1
 R10
-w1771464540
+w1771613279
 8./tb_flatten_layer_test.sv
 F./tb_flatten_layer_test.sv
 L0 3

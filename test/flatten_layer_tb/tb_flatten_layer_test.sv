@@ -90,9 +90,24 @@ module tb_final_layer_sequential;
 
 		@(posedge layer_done) #3
 		$display("Test 3 - Expected: %0d | Got: %0d", label[0], answer);
+
+		// --- Test 4 Verify effect of Enable and Reset
+		// Answer should remain without enable
+		// Reset signal should be sent low (active low reset) before setting enable
+		// Input values should be set before setting enable
+		// Answer will appear on next clock cycle after enable set high
+		
+		en = 0;
+		#6
 		reset = 0;
 		#1
 		reset = 1;
+		#6
+		en = 1;
+		#6
+
+		@(posedge layer_done) #3
+		$display("Test 4 - Expected: %0d | Got: %0d", label[0], answer);	
 
 		$display("--- Tests Completed ---");
 		$stop;

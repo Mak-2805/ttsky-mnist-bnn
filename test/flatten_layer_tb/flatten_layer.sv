@@ -1,3 +1,11 @@
+// Reset to set answer to 0
+// There is a valid answer while the layer_3_done signal is high
+// To load a new set of inputs: 
+// 		1) Ensure reset signal is high
+// 		2) Load inputs to data_in and weights_in
+//		3) Set en pin high
+//		3) Answer will appear on next rising clock edge
+
 module final_layer_sequential #(parameter NUM_INPUTS = 196) (
 	input logic clock,
 	input logic reset,
@@ -23,12 +31,12 @@ module final_layer_sequential #(parameter NUM_INPUTS = 196) (
 		end
 	end
 
-	always_ff @(posedge clock or negedge reset or negedge en) begin
-		if (!reset | !en) begin
+	always_ff @(posedge clock or negedge reset) begin
+		if (!reset) begin
 			for (int i = 0; i < 10; i++) begin
 				popcount[i] <= 8'd0;
 			end
-		end else if (!layer_3_done) begin
+		end else if (!layer_3_done & en) begin
 			popcount <= next_popcount;
 		end
 	end

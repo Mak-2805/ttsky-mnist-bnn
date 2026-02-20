@@ -1,0 +1,37 @@
+SRC     = ../../src
+LIBDIR  = $(HOME)/lib
+export LD_LIBRARY_PATH := $(LIBDIR):$(LD_LIBRARY_PATH)
+
+NUM ?= 5   # number of MNIST images; override with: make -f Makefile.iverilog NUM=20
+
+.PHONY: all gen compile run view clean help
+
+all: gen compile run
+
+gen:
+	@echo "Generating testbench from trained model ($(NUM) images)..."
+	python3 gen_layer_two_tb.py $(NUM)
+
+compile:
+	@echo "Compiling..."
+	iverilog -g2012 -o sim_layer_two.vvp \
+	    tb_layer_two.sv \
+	    $(SRC)/layer_two.sv
+
+run: compile
+	@echo "Running simulation..."
+	vvp sim_layer_two.vvp
+	@echo "Waveform saved to layer_two.vcd"
+
+view:
+	gtkwave layer_two.vcd &
+
+clean:
+	rm -f sim_layer_two.vvp layer_two.vcd tb_layer_two.sv
+
+help:
+	@echo "make -f Makefile.iverilog [NUM=N]   generate + compile + run (default N=5)"
+	@echo "make -f Makefile.iverilog gen       generate tb_layer_two.sv"
+	@echo "make -f Makefile.iverilog compile   compile only"
+	@echo "make -f Makefile.iverilog run       compile and run"
+	@echo "make -f Makefile.iverilog view      open waveform in GTKWave"

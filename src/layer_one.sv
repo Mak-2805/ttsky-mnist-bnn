@@ -116,7 +116,7 @@ module layer_one (
         threshold    = 5 + (weight_num & 4'b1);
         conv_result  = conv(pool_r, pool_c, weight_num);
         count_result = count_ones(conv_result);
-        out_bit      = (count_result >= threshold);
+        out_bit      = (count_result > threshold);
     end
 
     always @(posedge clk) begin

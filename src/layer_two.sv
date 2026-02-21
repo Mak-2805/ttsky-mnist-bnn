@@ -159,7 +159,7 @@ module layer_two (
         pool_c  = pool_cnt[0] ? ((col << 1) + 1) : (col << 1);
         thresh  = get_threshold(weight_num);
         cr      = conv(pool_r, pool_c, weight_num);
-        out_bit = (count_ones72(cr) >= thresh);
+        out_bit = (count_ones72(cr) > thresh);
     end
 
     // -----------------------------------------------------------------------

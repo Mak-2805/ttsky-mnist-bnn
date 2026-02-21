@@ -21,11 +21,14 @@ module layer_two (
     input wire [2:0] state,
 
     input wire [1567:0] pixels,    // layer_one_out: 14x14 pixels, 8 channels each
-    input wire [287:0]  weights,   // 4 filters of 3x3x8 binary weights
 
     output reg [195:0] layer_two_out,  // 4 filters of 7x7 binary output
     output reg done
 );
+
+    // Hardcoded weights: 4 filters x 3x3 kernel x 8 channels = 288 bits
+    // Encoding: WEIGHTS2[wn*72 + pos*8 +: 8] for filter wn at kernel pos
+    localparam [287:0] WEIGHTS2 = 288'h78F8FBFCBF8F25678FF07070FCF8BFA7A7BF407100703870B4BABA070707717470FCBFFC;
 
     localparam [2:0] s_LAYER_2 = 3'b011;
 
@@ -131,15 +134,15 @@ module layer_two (
             // XNOR each 8-channel pixel against its 8-bit weight slice for filter wn.
             // Each channel has its own independent weight bit.
             conv = {
-                ~(tl ^ weights[wn*72 +  0 +: 8]),   // kernel[0][0]
-                ~(tm ^ weights[wn*72 +  8 +: 8]),   // kernel[0][1]
-                ~(tr ^ weights[wn*72 + 16 +: 8]),   // kernel[0][2]
-                ~(ml ^ weights[wn*72 + 24 +: 8]),   // kernel[1][0]
-                ~(mm ^ weights[wn*72 + 32 +: 8]),   // kernel[1][1]
-                ~(mr ^ weights[wn*72 + 40 +: 8]),   // kernel[1][2]
-                ~(bl ^ weights[wn*72 + 48 +: 8]),   // kernel[2][0]
-                ~(bm ^ weights[wn*72 + 56 +: 8]),   // kernel[2][1]
-                ~(br ^ weights[wn*72 + 64 +: 8])    // kernel[2][2]
+                ~(tl ^ WEIGHTS2[wn*72 +  0 +: 8]),   // kernel[0][0]
+                ~(tm ^ WEIGHTS2[wn*72 +  8 +: 8]),   // kernel[0][1]
+                ~(tr ^ WEIGHTS2[wn*72 + 16 +: 8]),   // kernel[0][2]
+                ~(ml ^ WEIGHTS2[wn*72 + 24 +: 8]),   // kernel[1][0]
+                ~(mm ^ WEIGHTS2[wn*72 + 32 +: 8]),   // kernel[1][1]
+                ~(mr ^ WEIGHTS2[wn*72 + 40 +: 8]),   // kernel[1][2]
+                ~(bl ^ WEIGHTS2[wn*72 + 48 +: 8]),   // kernel[2][0]
+                ~(bm ^ WEIGHTS2[wn*72 + 56 +: 8]),   // kernel[2][1]
+                ~(br ^ WEIGHTS2[wn*72 + 64 +: 8])    // kernel[2][2]
             };
         end
     endfunction

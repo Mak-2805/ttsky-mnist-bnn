@@ -5,13 +5,15 @@ module layer_one (
     // Flattened arrays for Verilog-2001 compatibility
     // pixels: 28x28 = 784 bits [783:0]
     input wire [783:0] pixels,
-    // weights: 3x3x8 = 72 bits [71:0]
-    input wire [71:0] weights,
 
     // layer_one_out: 14x14x8 = 1568 bits [1567:0]
     output reg [1567:0] layer_one_out,
     output reg done
 );
+
+    // Hardcoded weights: 8 filters x 3x3 kernel = 72 bits
+    // Encoding: weights1[kr*24 + kc*8 + wn] = weight bit for filter wn at kernel pos (kr,kc)
+    localparam [71:0] WEIGHTS1 = 72'h060703868D8FF878EA;
 
     localparam [2:0] s_IDLE    = 3'b000;
     localparam [2:0] s_LOAD    = 3'b001;
@@ -87,15 +89,15 @@ module layer_one (
 
             // XNOR operation with weights and pack into 9-bit result
             conv = {
-                ~(top_left  ^ weights[wt_idx(0, 0, wt_num)]),
-                ~(top_mid   ^ weights[wt_idx(0, 1, wt_num)]),
-                ~(top_right ^ weights[wt_idx(0, 2, wt_num)]),
-                ~(mid_left  ^ weights[wt_idx(1, 0, wt_num)]),
-                ~(mid_mid   ^ weights[wt_idx(1, 1, wt_num)]),
-                ~(mid_right ^ weights[wt_idx(1, 2, wt_num)]),
-                ~(bot_left  ^ weights[wt_idx(2, 0, wt_num)]),
-                ~(bot_mid   ^ weights[wt_idx(2, 1, wt_num)]),
-                ~(bot_right ^ weights[wt_idx(2, 2, wt_num)])
+                ~(top_left  ^ WEIGHTS1[wt_idx(0, 0, wt_num)]),
+                ~(top_mid   ^ WEIGHTS1[wt_idx(0, 1, wt_num)]),
+                ~(top_right ^ WEIGHTS1[wt_idx(0, 2, wt_num)]),
+                ~(mid_left  ^ WEIGHTS1[wt_idx(1, 0, wt_num)]),
+                ~(mid_mid   ^ WEIGHTS1[wt_idx(1, 1, wt_num)]),
+                ~(mid_right ^ WEIGHTS1[wt_idx(1, 2, wt_num)]),
+                ~(bot_left  ^ WEIGHTS1[wt_idx(2, 0, wt_num)]),
+                ~(bot_mid   ^ WEIGHTS1[wt_idx(2, 1, wt_num)]),
+                ~(bot_right ^ WEIGHTS1[wt_idx(2, 2, wt_num)])
             };
         end
 

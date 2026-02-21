@@ -14,12 +14,15 @@ module final_layer_sequential #(parameter NUM_INPUTS = 196) (
 	input logic reset,
 	input logic [2:0] state,
 	input logic [NUM_INPUTS-1:0] data_in,
-	input logic [NUM_INPUTS*10-1:0] weights_in,
 	output logic [3:0] answer,
 	output logic layer_3_done
 	);
 
 	localparam s_IDLE = 3'b000, s_LOAD = 3'b001, s_LAYER_1 = 3'b010, s_LAYER_2 = 3'b011, s_LAYER_3 = 3'b100;
+
+	// Hardcoded weights: 10 neurons x 196 inputs = 1960 bits
+	// Encoding: neuron n uses bits [n*196 +: 196]
+	localparam [NUM_INPUTS*10-1:0] WEIGHTS3 = 1960'hDD88CE908333B3C085F14AA8CC4400DD80122CDAEEB45DC8784E532638CD44292FC88557C85F5CCD844191CC820276FE0C628CC8C2222017AFE022B0C133FFAACFDDD25735D1BC8C7FC0B9998F26FBF88AEC8462C4D80871338891E7E0019898881E5279F3AF66DDF298377F771F77F7777F042DDF30063767E207777222A1E63125FFFFF70C8A4986802068C80215115667B7A047EFD20EFDDD28D77DD60FFE3FAE817FF200DFDCC68D3137738037DDD7EE7D7BCC8C33093FA38477F3A0CFFE346319A776663671D0E489A0222ADD2A028612A228624A221C72793C437B37B04CEDE77CD02844C83680088EE80120040E367366E6;
 
 	logic [7:0] popcount [9:0];
 	logic [3:0] neuron_cnt;  // counts 0..9 then holds at 10 when done
@@ -30,7 +33,7 @@ module final_layer_sequential #(parameter NUM_INPUTS = 196) (
 	logic [7:0] cur_popcount;
 
 	always @(*) begin
-		cur_weights  = weights_in[neuron_cnt * NUM_INPUTS +: NUM_INPUTS];
+		cur_weights  = WEIGHTS3[neuron_cnt * NUM_INPUTS +: NUM_INPUTS];
 		cur_popcount = 0;
 		for (int i = 0; i < NUM_INPUTS; i++) begin
 			cur_popcount = cur_popcount + (cur_weights[i] ^~ data_in[i]);

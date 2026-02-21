@@ -57,9 +57,6 @@ module tt_um_mnist_bnn (
     
   //set dimensions
   logic [783:0] pixels;
-  logic [71:0] weights1;
-  logic [287:0] weights2;
-  logic [1959:0] weights3;
   logic [1567:0] layer_1_out;
   logic [195:0] layer_2_out;
 
@@ -68,11 +65,7 @@ module tt_um_mnist_bnn (
     .reset_n(synchronous_reset),
     .state(state),
     .d_in_p(ui_in[1]),
-    .d_in_w(ui_in[2]),
     .pixels(pixels),
-    .weights1(weights1),
-    .weights2(weights2),
-    .weights3(weights3),
     .load_done(load_done)
   );
 
@@ -87,7 +80,6 @@ module tt_um_mnist_bnn (
     .rst_n(synchronous_reset),
     .state(state),
     .pixels(pixels),
-    .weights(weights1),
     .layer_one_out(layer_1_out),
     .done(layer1_done)
   );
@@ -100,7 +92,6 @@ module tt_um_mnist_bnn (
     .rst_n(synchronous_reset),
     .state(state),
     .pixels(layer_1_out),
-    .weights(weights2),
     .layer_two_out(layer_2_out),
     .done(layer2_done)
   );
@@ -110,11 +101,10 @@ module tt_um_mnist_bnn (
 
   final_layer_sequential u3 (
     .clock(clk),
-	  .reset(synchronous_reset),
+    .reset(synchronous_reset),
     .state(state),
-	  .data_in(layer_2_out),
-	  .weights_in(weights3),
-	  .answer(answer_w),
+    .data_in(layer_2_out),
+    .answer(answer_w),
     .layer_3_done(layer3_done)
   );
 
@@ -122,6 +112,6 @@ module tt_um_mnist_bnn (
   //Michael will try to cook this up
     
   // List all unused inputs to prevent warnings
-  wire _unused = &{ena,ui_in[7:3], 1'b0};
+  wire _unused = &{ena, ui_in[7:2], 1'b0};
 
 endmodule

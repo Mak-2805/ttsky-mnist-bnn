@@ -35,11 +35,10 @@ module layer_two (
         input [3:0] wt_num;
         begin
             case (wt_num)
-                4'd0:    get_threshold = 7'd100;
-                4'd1:    get_threshold = 7'd100;
-                4'd2:    get_threshold = 7'd100;
-                //4'd3:    get_threshold = 7'd37;
-                4'd3:    get_threshold = 7'd100;
+                4'd0:    get_threshold = 7'd41;
+                4'd1:    get_threshold = 7'd42;
+                4'd2:    get_threshold = 7'd35;
+                4'd3:    get_threshold = 7'd37;
                 default: get_threshold = 7'd41;
             endcase
         end

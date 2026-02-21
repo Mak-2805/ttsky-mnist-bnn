@@ -33,9 +33,6 @@ run: compile
 view:
 	gtkwave top.vcd &
 
-clean:
-	rm -f sim_top.vvp top.vcd pixels.mem weights.mem
-
 help:
 	@echo "make -f Makefile.iverilog [DIGIT=N]   generate + compile + run (N=0,1,7)"
 	@echo "make -f Makefile.iverilog gen         generate .mem files only"

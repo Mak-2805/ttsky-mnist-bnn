@@ -3,19 +3,13 @@
 
 clean:
 	rm -rf build *.vcd *.fst *.xml simulation_results/
-	@echo "Cleaning up..."
 	rm -rf obj_dir *.fst *.vcd *.log
-	@echo "Cleaning up..."
 	rm -f $(VVP) *.fst *.vcd *.log
-	@echo "Cleaning up..."
 	rm -f $(VVP_SIMPLE) $(VVP_DIGITS) *.fst *.vcd *.log
 	rm -f sim_layer_two.vvp layer_two.vcd tb_layer_two.sv
-	@echo "Cleaning up..."
 	rm -f $(VVP) *.fst *.vcd *.log
-	clean:
-	@echo "Cleaning up..."
 	rm -rf obj_dir *.fst *.vcd *.log
-	clean:
+	rm -f sim_top.vvp top.vcd pixels.mem weights.mem
 	rm -f sim_top.vvp top.vcd pixels.mem weights.mem
 
 # defaults

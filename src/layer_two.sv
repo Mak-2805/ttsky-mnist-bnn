@@ -10,6 +10,11 @@
 //   pixels        [1567:0]  (row*14 + col)*8 + ch          (14x14x8 bits)
 //   weights       [287:0]   wt_num*72 + (row*3+col)*8 + ch (4x3x3x8 bits)
 //   layer_two_out [195:0]   wn*49 + row*7 + col            (4x7x7 bits)
+//
+// Sequential max-pool: pool_cnt (0-3) cycles through the 4 positions of
+// the 2x2 pool window one per clock, accumulating the OR result.
+// This replaces the previous 4-simultaneous-conv approach which created
+// too large a combinational mux tree for synthesis.
 
 module layer_two (
     input wire clk, rst_n,
@@ -26,6 +31,8 @@ module layer_two (
 
     reg [3:0] row, col;
     reg [3:0] weight_num;
+    reg [1:0] pool_cnt;  // 0-3: which 2x2 pool position is being computed
+    reg       pool_acc;  // running OR across the 4 pool positions
 
     // -----------------------------------------------------------------------
     // Per-filter batch-norm thresholds (72-bit popcount space):
@@ -138,7 +145,26 @@ module layer_two (
     endfunction
 
     // -----------------------------------------------------------------------
-    // Sequential state machine: iterate through 4 filters x 7x7 output grid
+    // Combinational: ONE conv per cycle, selected by pool_cnt.
+    // pool_cnt[1] selects the row offset (0 or 1) within the 2x2 pool window.
+    // pool_cnt[0] selects the col offset (0 or 1).
+    // -----------------------------------------------------------------------
+    reg [3:0] pool_r, pool_c;
+    reg [71:0] cr;
+    reg [6:0]  thresh;
+    reg        out_bit;
+
+    always @(*) begin
+        pool_r  = pool_cnt[1] ? ((row << 1) + 1) : (row << 1);
+        pool_c  = pool_cnt[0] ? ((col << 1) + 1) : (col << 1);
+        thresh  = get_threshold(weight_num);
+        cr      = conv(pool_r, pool_c, weight_num);
+        out_bit = (count_ones72(cr) >= thresh);
+    end
+
+    // -----------------------------------------------------------------------
+    // Sequential state machine: iterate through 4 filters x 7x7 output grid.
+    // Each output pixel takes 4 cycles (one per 2x2 pool position).
     // -----------------------------------------------------------------------
     always @(posedge clk) begin
         if (!rst_n) begin
@@ -147,21 +173,32 @@ module layer_two (
             done          <= 1'b0;
             weight_num    <= 4'b0;
             layer_two_out <= 0;
+            pool_cnt      <= 2'b0;
+            pool_acc      <= 1'b0;
         end
         else begin
             if (state == s_LAYER_2) begin
                 if (weight_num < 4) begin
-                    layer_two_out[out_idx(weight_num, row, col)] <= out_bit;
-                    if (col < 6) begin
-                        col <= col + 1;
+                    if (pool_cnt < 3) begin
+                        // Accumulate max-pool: OR in this position's result
+                        pool_acc <= pool_acc | out_bit;
+                        pool_cnt <= pool_cnt + 1;
                     end else begin
-                        if (row < 6) begin
-                            row <= row + 1;
-                            col <= 4'b0;
+                        // Last pool position: write final result and advance
+                        layer_two_out[out_idx(weight_num, row, col)] <= pool_acc | out_bit;
+                        pool_cnt <= 2'b0;
+                        pool_acc <= 1'b0;
+                        if (col < 6) begin
+                            col <= col + 1;
                         end else begin
-                            row        <= 4'b0;
-                            col        <= 4'b0;
-                            weight_num <= weight_num + 1;
+                            if (row < 6) begin
+                                row <= row + 1;
+                                col <= 4'b0;
+                            end else begin
+                                row        <= 4'b0;
+                                col        <= 4'b0;
+                                weight_num <= weight_num + 1;
+                            end
                         end
                     end
                 end else begin
@@ -169,32 +206,6 @@ module layer_two (
                 end
             end
         end
-    end
-
-    // -----------------------------------------------------------------------
-    // Combinational: conv + batch-norm threshold + 2x2 max-pool
-    //
-    // Input is 14x14; each output pixel (row, col) covers a 2x2 max-pool
-    // window at input positions (row*2, col*2) through (row*2+1, col*2+1).
-    // Output is 1 if ANY of the 4 convolution results crosses the threshold.
-    // Only the single bit indexed by (weight_num, row, col) is written;
-    // all other bits of layer_two_out retain their registered value.
-    // -----------------------------------------------------------------------
-    reg [71:0] cr00, cr01, cr10, cr11;
-    reg [6:0]  thresh;
-    reg        out_bit;
-
-    always @(*) begin
-        thresh = get_threshold(weight_num);
-        cr00   = conv(row << 1,         col << 1,       weight_num);
-        cr01   = conv(row << 1,       (col << 1) + 1,   weight_num);
-        cr10   = conv((row << 1) + 1,   col << 1,       weight_num);
-        cr11   = conv((row << 1) + 1, (col << 1) + 1,   weight_num);
-
-        out_bit = ((count_ones72(cr00) >= thresh) |
-                   (count_ones72(cr01) >= thresh) |
-                   (count_ones72(cr10) >= thresh) |
-                   (count_ones72(cr11) >= thresh));
     end
 
 endmodule

@@ -12,7 +12,7 @@ module layer_one (
     output reg [1567:0] layer_one_out,
     output reg done
 );
-    
+
     localparam [2:0] s_IDLE    = 3'b000;
     localparam [2:0] s_LOAD    = 3'b001;
     localparam [2:0] s_LAYER_1 = 3'b010;
@@ -21,6 +21,8 @@ module layer_one (
 
     reg [4:0] row, col;
     reg [3:0] weight_num;
+    reg [1:0] pool_cnt;  // 0-3: which 2x2 pool position is being computed
+    reg       pool_acc;  // running OR across the 4 pool positions
 
     // Helper function to index into flattened pixels array
     // pixels[r][c] -> pixels[r*28 + c]
@@ -51,37 +53,6 @@ module layer_one (
         end
     endfunction
 
-    always @(posedge clk) begin
-        if (!rst_n) begin
-            row <= 0;
-            col <= 0;
-            done <= 0;
-            weight_num <= 0;
-            layer_one_out <= 0;
-        end
-        else begin
-            if (state == s_LAYER_1) begin
-                if (weight_num < 8) begin
-                    layer_one_out[out_idx(weight_num, row, col)] <= out_bit;
-                    if (col < 13) begin
-                        col <= col + 1;
-                    end else begin
-                        if (row < 13) begin
-                            row <= row + 1;
-                            col <= 0;
-                        end else begin
-                            row <= 0;
-                            col <= 0;
-                            weight_num <= weight_num + 1;
-                        end
-                    end
-                end else begin
-                    done <= 1;
-                end
-            end
-        end
-    end
-
     // Helper function to count ones in a 9-bit value
     function [3:0] count_ones;
         input [8:0] val;
@@ -93,29 +64,6 @@ module layer_one (
             end
         end
     endfunction
-
-    // convolution + normalization + max pooling part
-    reg [8:0] conv_result_00, conv_result_01, conv_result_10, conv_result_11;
-    reg [3:0] count_00, count_01, count_10, count_11;
-    reg [3:0] threshold;
-    reg out_bit;
-
-    always @(*) begin
-        threshold = 5 + (weight_num & 4'b1);
-        conv_result_00 = conv(row << 1, col << 1, weight_num);
-        conv_result_01 = conv(row << 1, (col << 1) + 1, weight_num);
-        conv_result_10 = conv((row << 1) + 1, col << 1, weight_num);
-        conv_result_11 = conv((row << 1) + 1, (col << 1) + 1, weight_num);
-
-        count_00 = count_ones(conv_result_00);
-        count_01 = count_ones(conv_result_01);
-        count_10 = count_ones(conv_result_10);
-        count_11 = count_ones(conv_result_11);
-
-        out_bit = ((count_00 >= threshold) | (count_01 >= threshold) |
-                   (count_10 >= threshold) | (count_11 >= threshold));
-    end
-
 
     function [8:0] conv;
         input [4:0] r, c;
@@ -152,5 +100,65 @@ module layer_one (
         end
 
     endfunction
+
+    // Combinational: compute ONE conv per cycle based on pool_cnt.
+    // pool_cnt[1] selects the row offset (0 or 1) within the 2x2 pool window.
+    // pool_cnt[0] selects the col offset (0 or 1).
+    reg [4:0] pool_r, pool_c;
+    reg [8:0] conv_result;
+    reg [3:0] count_result;
+    reg [3:0] threshold;
+    reg       out_bit;
+
+    always @(*) begin
+        pool_r       = pool_cnt[1] ? ((row << 1) + 1) : (row << 1);
+        pool_c       = pool_cnt[0] ? ((col << 1) + 1) : (col << 1);
+        threshold    = 5 + (weight_num & 4'b1);
+        conv_result  = conv(pool_r, pool_c, weight_num);
+        count_result = count_ones(conv_result);
+        out_bit      = (count_result >= threshold);
+    end
+
+    always @(posedge clk) begin
+        if (!rst_n) begin
+            row           <= 0;
+            col           <= 0;
+            done          <= 0;
+            weight_num    <= 0;
+            layer_one_out <= 0;
+            pool_cnt      <= 0;
+            pool_acc      <= 0;
+        end
+        else begin
+            if (state == s_LAYER_1) begin
+                if (weight_num < 8) begin
+                    if (pool_cnt < 3) begin
+                        // Accumulate max-pool: OR in this position's result
+                        pool_acc <= pool_acc | out_bit;
+                        pool_cnt <= pool_cnt + 1;
+                    end else begin
+                        // Last pool position: write final result and advance
+                        layer_one_out[out_idx(weight_num, row, col)] <= pool_acc | out_bit;
+                        pool_cnt <= 0;
+                        pool_acc <= 0;
+                        if (col < 13) begin
+                            col <= col + 1;
+                        end else begin
+                            if (row < 13) begin
+                                row <= row + 1;
+                                col <= 0;
+                            end else begin
+                                row <= 0;
+                                col <= 0;
+                                weight_num <= weight_num + 1;
+                            end
+                        end
+                    end
+                end else begin
+                    done <= 1;
+                end
+            end
+        end
+    end
 
 endmodule

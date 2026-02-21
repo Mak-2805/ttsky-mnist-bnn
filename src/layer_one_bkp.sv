@@ -57,12 +57,10 @@ module layer_one (
             col <= 0;
             done <= 0;
             weight_num <= 0;
-            layer_one_out <= 0;
         end
         else begin
             if (state == s_LAYER_1) begin
                 if (weight_num < 8) begin
-                    layer_one_out[out_idx(weight_num, row, col)] <= out_bit;
                     if (col < 13) begin
                         col <= col + 1;
                     end else begin
@@ -98,7 +96,6 @@ module layer_one (
     reg [8:0] conv_result_00, conv_result_01, conv_result_10, conv_result_11;
     reg [3:0] count_00, count_01, count_10, count_11;
     reg [3:0] threshold;
-    reg out_bit;
 
     always @(*) begin
         threshold = 5 + (weight_num & 4'b1);
@@ -112,8 +109,9 @@ module layer_one (
         count_10 = count_ones(conv_result_10);
         count_11 = count_ones(conv_result_11);
 
-        out_bit = ((count_00 >= threshold) | (count_01 >= threshold) |
-                   (count_10 >= threshold) | (count_11 >= threshold));
+        layer_one_out[out_idx(weight_num, row, col)] =
+            ((count_00 >= threshold) | (count_01 >= threshold) |
+             (count_10 >= threshold) | (count_11 >= threshold));
     end
 
 

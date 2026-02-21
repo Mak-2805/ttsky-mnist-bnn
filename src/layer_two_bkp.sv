@@ -142,16 +142,14 @@ module layer_two (
     // -----------------------------------------------------------------------
     always @(posedge clk) begin
         if (!rst_n) begin
-            row           <= 4'b0;
-            col           <= 4'b0;
-            done          <= 1'b0;
-            weight_num    <= 4'b0;
-            layer_two_out <= 0;
+            row        <= 4'b0;
+            col        <= 4'b0;
+            done       <= 1'b0;
+            weight_num <= 4'b0;
         end
         else begin
             if (state == s_LAYER_2) begin
                 if (weight_num < 4) begin
-                    layer_two_out[out_idx(weight_num, row, col)] <= out_bit;
                     if (col < 6) begin
                         col <= col + 1;
                     end else begin
@@ -182,7 +180,6 @@ module layer_two (
     // -----------------------------------------------------------------------
     reg [71:0] cr00, cr01, cr10, cr11;
     reg [6:0]  thresh;
-    reg        out_bit;
 
     always @(*) begin
         thresh = get_threshold(weight_num);
@@ -191,10 +188,11 @@ module layer_two (
         cr10   = conv((row << 1) + 1,   col << 1,       weight_num);
         cr11   = conv((row << 1) + 1, (col << 1) + 1,   weight_num);
 
-        out_bit = ((count_ones72(cr00) >= thresh) |
-                   (count_ones72(cr01) >= thresh) |
-                   (count_ones72(cr10) >= thresh) |
-                   (count_ones72(cr11) >= thresh));
+        layer_two_out[out_idx(weight_num, row, col)] =
+            ((count_ones72(cr00) >= thresh) |
+             (count_ones72(cr01) >= thresh) |
+             (count_ones72(cr10) >= thresh) |
+             (count_ones72(cr11) >= thresh));
     end
 
 endmodule

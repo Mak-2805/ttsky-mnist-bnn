@@ -2,15 +2,18 @@
 # See https://docs.cocotb.org/en/stable/quickstart.html for more info
 
 clean:
-	rm -rf build *.vcd *.fst *.xml simulation_results/
-	rm -rf obj_dir *.fst *.vcd *.log
-	rm -f $(VVP) *.fst *.vcd *.log
-	rm -f $(VVP_SIMPLE) $(VVP_DIGITS) *.fst *.vcd *.log
-	rm -f sim_layer_two.vvp layer_two.vcd tb_layer_two.sv
-	rm -f $(VVP) *.fst *.vcd *.log
-	rm -rf obj_dir *.fst *.vcd *.log
-	rm -f sim_top.vvp top.vcd pixels.mem weights.mem
-	rm -f sim_top.vvp top.vcd pixels.mem weights.mem
+#rm -rf build *.vcd *.fst *.xml simulation_results/
+#rm -rf obj_dir *.fst *.vcd *.log
+#rm -f $(VVP) *.fst *.vcd *.log
+#rm -f $(VVP_SIMPLE) $(VVP_DIGITS) *.fst *.vcd *.log
+#rm -f sim_layer_two.vvp layer_two.vcd tb_layer_two.sv
+#rm -f $(VVP) *.fst *.vcd *.log
+#rm -rf obj_dir *.fst *.vcd *.log
+	rm -rf layer_one_tb/*.vvp*
+	rm -rf layer_two_tb/*.vvp*
+	rm -f top_test_tb/*.vvp*
+	rm -f top_test_tb/*.vcd*
+#rm -f top_test_tb/*.mem*
 
 # defaults
 SIM ?= icarus

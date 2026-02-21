@@ -1,0 +1,45 @@
+SRC     = ../../src
+LIBDIR  = $(HOME)/lib
+export LD_LIBRARY_PATH := $(LIBDIR):$(LD_LIBRARY_PATH)
+
+# Digit shape to test (0, 1, or 7). Override with: make -f Makefile.iverilog DIGIT=0
+DIGIT ?= 7
+
+.PHONY: all gen compile run view clean help
+
+all: gen compile run
+
+gen:
+	@echo "Generating .mem files for synthetic digit $(DIGIT)..."
+	python3 gen_mem_files.py $(DIGIT)
+
+compile:
+	@echo "Compiling..."
+	iverilog -g2012 -o sim_top.vvp \
+	    $(SRC)/tt_um_mnist_bnn.v \
+	    $(SRC)/fsm.sv \
+	    $(SRC)/registers.sv \
+	    $(SRC)/layer_one.sv \
+	    $(SRC)/layer_two.sv \
+	    $(SRC)/flatten_layer.sv \
+	    $(SRC)/pipe.sv \
+	    $(SRC)/reset_pipe.sv \
+	    tb_top.sv
+
+run: compile
+	@echo "Running simulation..."
+	vvp sim_top.vvp
+
+view:
+	gtkwave top.vcd &
+
+clean:
+	rm -f sim_top.vvp top.vcd pixels.mem weights.mem
+
+help:
+	@echo "make -f Makefile.iverilog [DIGIT=N]   generate + compile + run (N=0,1,7)"
+	@echo "make -f Makefile.iverilog gen         generate .mem files only"
+	@echo "make -f Makefile.iverilog compile     compile only"
+	@echo "make -f Makefile.iverilog run         compile and run"
+	@echo "make -f Makefile.iverilog view        open waveform in GTKWave"
+	@echo "make -f Makefile.iverilog clean       remove generated files"

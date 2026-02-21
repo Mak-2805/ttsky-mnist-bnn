@@ -3,10 +3,9 @@
 
 # defaults
 SIM ?= icarus
-FST ?= -fst # Use more efficient FST format
 TOPLEVEL_LANG ?= verilog
 SRC_DIR = $(PWD)/../../src
-PROJECT_SOURCES = tt_um_mnist_bnn.v fsm.sv layer_one.sv
+PROJECT_SOURCES = tt_um_mnist_bnn.v fsm.sv registers.sv layer_one.sv layer_two.sv flatten_layer.sv pipe.sv reset_pipe.sv
 
 ifneq ($(GATES),yes)
 
@@ -30,6 +29,9 @@ VERILOG_SOURCES += $(PDK_ROOT)/sky130A/libs.ref/sky130_fd_sc_hd/verilog/sky130_f
 VERILOG_SOURCES += $(PWD)/gate_level_netlist.v
 
 endif
+
+# Enable SystemVerilog (always_ff, always_comb, logic, enum, etc.)
+COMPILE_ARGS		+= -g2012
 
 # Allow sharing configuration between design and testbench via `include`:
 COMPILE_ARGS 		+= -I$(SRC_DIR)

@@ -15,11 +15,11 @@ module layer_one (
     // Encoding: weights1[kr*24 + kc*8 + wn] = weight bit for filter wn at kernel pos (kr,kc)
     localparam [71:0] WEIGHTS1 = 72'h060703868D8FF878EA;
 
-    localparam [2:0] s_IDLE    = 3'b000;
-    localparam [2:0] s_LOAD    = 3'b001;
+    //localparam [2:0] s_IDLE    = 3'b000;
+    //localparam [2:0] s_LOAD    = 3'b001;
     localparam [2:0] s_LAYER_1 = 3'b010;
-    localparam [2:0] s_LAYER_2 = 3'b011;
-    localparam [2:0] s_LAYER_3 = 3'b100;
+    //localparam [2:0] s_LAYER_2 = 3'b011;
+    //localparam [2:0] s_LAYER_3 = 3'b100;
 
     reg [4:0] row, col;
     reg [3:0] weight_num;

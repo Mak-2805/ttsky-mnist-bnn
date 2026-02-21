@@ -101,7 +101,7 @@ module tt_um_mnist_bnn (
 
   final_layer_sequential u3 (
     .clock(clk),
-    .reset(synchronous_reset),
+    .reset(rst_n),
     .state(state),
     .data_in(layer_2_out),
     .answer(answer_w),

@@ -6,7 +6,7 @@ module flatten_layer #(parameter NUM_INPUTS = 196) (
 	output logic [3:0] answer
 );
 
-    final_layer_combinational (
+    final_layer_combinational uflc (
 	    .clock(clock),
 	    .reset(reset),
 	    .data_in(data_in),
@@ -14,7 +14,7 @@ module flatten_layer #(parameter NUM_INPUTS = 196) (
 	    .answer(answer)
 	);
 
-    final_layer_sequential (
+    final_layer_sequential ufls (
 	    .clock(clock),
 	    .reset(reset),
 	    .data_in(data_in),

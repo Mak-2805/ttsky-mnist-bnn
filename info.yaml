@@ -22,7 +22,7 @@ project:
     - "fsm.sv"
     - "registers.sv"
     - "pipe.sv"
-    - "layer_one_try.sv"
+    - "layer_one.sv"
     - "layer_two.sv"
     - "flatten_layer.sv"
 

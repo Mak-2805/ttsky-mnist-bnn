@@ -3,11 +3,9 @@
 // To load a new set of inputs:
 // 		1) Ensure reset signal is high
 // 		2) Load inputs to data_in and weights_in
-//		3) Answer will appear after layer_3_done goes high
-//
-// SEQUENTIAL VERSION: computes one neuron's popcount per clock cycle
-// (10 cycles total) instead of all 10 in parallel, greatly reducing
-// combinational logic depth and synthesis memory usage.
+//		3) Answer will appear on next rising clock edge after state enters s_LAYER_3
+
+// FYi ICARUS VERILOG IS OLD VERSION.. CAN'T SUPPORT A LOT OF THE THINGS LIKE ALWAYS_COMB, ALWAYS_FF AND ASSIGNING ARRAYS TO ARRAYS (MANUALLY DONE WITH FOR LOOP IN THIS FILE FOR NEURON POPCOUNT).. CHANGE BACK TO OLD SV CODE IF NEEDED!!
 
 module final_layer_sequential #(parameter NUM_INPUTS = 196) (
 	input logic clock,
@@ -20,49 +18,41 @@ module final_layer_sequential #(parameter NUM_INPUTS = 196) (
 	);
 
 	localparam s_IDLE = 3'b000, s_LOAD = 3'b001, s_LAYER_1 = 3'b010, s_LAYER_2 = 3'b011, s_LAYER_3 = 3'b100;
-
 	logic [7:0] popcount [9:0];
-	logic [3:0] neuron_cnt;  // counts 0..9 then holds at 10 when done
+	logic [7:0] next_popcount [9:0];
+	logic [NUM_INPUTS-1:0] xnor_result [9:0];
 
-	// DOT PRODUCT LOGIC - one neuron per cycle
-	// Combinational: compute XNOR popcount for the current neuron only
-	logic [NUM_INPUTS-1:0] cur_weights;
-	logic [7:0] cur_popcount;
+	// DOT PRODUCT LOGIC
 
 	always @(*) begin
-		cur_weights  = weights_in[neuron_cnt * NUM_INPUTS +: NUM_INPUTS];
-		cur_popcount = 0;
-		for (int i = 0; i < NUM_INPUTS; i++) begin
-			cur_popcount = cur_popcount + (cur_weights[i] ^~ data_in[i]);
+		for (int neuron = 0; neuron < 10; neuron++) begin
+			xnor_result[neuron] = weights_in[neuron*NUM_INPUTS +: NUM_INPUTS] ^~ data_in;
+			next_popcount[neuron] = 0;
+			for (int i = 0; i<NUM_INPUTS; i++) begin
+				next_popcount[neuron] = next_popcount[neuron] + xnor_result[neuron][i];
+			end
 		end
 	end
 
-	// Sequential: register one neuron's result per cycle
 	always @(posedge clock or negedge reset) begin
 		if (!reset) begin
 			for (int i = 0; i < 10; i++) begin
 				popcount[i] <= 8'd0;
 			end
-			neuron_cnt <= 4'd0;
-		end else if (state != s_LAYER_3) begin
-			neuron_cnt <= 4'd0;   // reset counter between inferences
-		end else if (neuron_cnt < 10) begin
-			popcount[neuron_cnt] <= cur_popcount;
-			neuron_cnt <= neuron_cnt + 1;
+		end else if (state == s_LAYER_3 && !layer_3_done) begin
+			for (int i = 0; i < 10; i++) begin
+				popcount[i] <= next_popcount[i];
+			end
 		end
 	end
-
-	assign layer_3_done = (neuron_cnt >= 4'd10);
-
-	// COMPARATOR LOGIC (unchanged)
-
+	
+	// COMPARATOR LOGIC
+	
 	logic [7:0] round_1_val [4:0]; logic [3:0] round_1_idx [4:0];
 	logic [7:0] round_2_val [1:0]; logic [3:0] round_2_idx [1:0];
 	logic [7:0] round_3_val; logic [3:0] round_3_idx;
-
+	
 	always @(*) begin
-		answer = 4'd0;  // default to avoid latches
-
 		// First round
 		for (int i = 0; i < 5; i++) begin
 			if (popcount[i*2] >= popcount[i*2+1]) begin
@@ -73,7 +63,7 @@ module final_layer_sequential #(parameter NUM_INPUTS = 196) (
 				round_1_idx[i] = i*2+1;
 			end
 		end
-
+		
 		// Second round (round_1_val[4] gets passthrough to end)
 		for (int i = 0; i < 2; i++) begin
 			if (round_1_val[i*2] >= round_1_val[i*2+1]) begin
@@ -84,8 +74,8 @@ module final_layer_sequential #(parameter NUM_INPUTS = 196) (
 				round_2_idx[i] = round_1_idx[i*2+1];
 			end
 		end
-
-		// Third round
+		
+		// Third round (round_1_val[4] gets passthrough to end)
 		if (round_2_val[0] >= round_2_val[1]) begin
 			round_3_val = round_2_val[0];
 			round_3_idx = round_2_idx[0];
@@ -93,13 +83,20 @@ module final_layer_sequential #(parameter NUM_INPUTS = 196) (
 			round_3_val = round_2_val[1];
 			round_3_idx = round_2_idx[1];
 		end
-
+		
 		// Fourth/final round (round_1_val[4] gets passthrough to end)
 		if (round_3_val >= round_1_val[4]) begin
 			answer = round_3_idx;
 		end else begin
 			answer = round_1_idx[4];
 		end
-	end
 
+		if (answer != 0 || (answer == 0 && (round_3_val | round_1_val[4] != 0))) begin
+			layer_3_done = 1'b1;
+		end else begin
+			layer_3_done = 1'b0;
+		end
+	end
+			
+	
 endmodule

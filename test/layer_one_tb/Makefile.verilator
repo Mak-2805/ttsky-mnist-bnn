@@ -39,9 +39,6 @@ view:
 	@echo "Opening waveform viewer..."
 	gtkwave layer_one.fst &
 
-clean:
-	@echo "Cleaning up..."
-	rm -rf obj_dir *.fst *.vcd *.log
 
 help:
 	@echo "Layer One Testbench Makefile"

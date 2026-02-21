@@ -32,10 +32,6 @@ view:
 	@echo "Opening waveform viewer..."
 	gtkwave $(WAVE) &
 
-clean:
-	@echo "Cleaning up..."
-	rm -f $(VVP) *.fst *.vcd *.log
-
 help:
 	@echo "FSM Testbench Makefile (Icarus Verilog)"
 	@echo "========================================"

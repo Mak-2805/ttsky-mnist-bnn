@@ -35,10 +35,6 @@ view:
 	@echo "Opening waveform viewer..."
 	gtkwave fsm.fst &
 
-clean:
-	@echo "Cleaning up..."
-	rm -rf obj_dir *.fst *.vcd *.log
-
 help:
 	@echo "FSM Testbench Makefile"
 	@echo "======================"

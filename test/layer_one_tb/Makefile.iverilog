@@ -61,9 +61,6 @@ view-digits:
 	@echo "Opening digits testbench waveform viewer..."
 	gtkwave $(WAVE_DIGITS) &
 
-clean:
-	@echo "Cleaning up..."
-	rm -f $(VVP_SIMPLE) $(VVP_DIGITS) *.fst *.vcd *.log
 
 help:
 	@echo "Layer One Testbench Makefile (Icarus Verilog)"

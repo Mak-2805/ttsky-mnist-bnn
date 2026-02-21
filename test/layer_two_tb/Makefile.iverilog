@@ -26,8 +26,6 @@ run: compile
 view:
 	gtkwave layer_two.vcd &
 
-clean:
-	rm -f sim_layer_two.vvp layer_two.vcd tb_layer_two.sv
 
 help:
 	@echo "make -f Makefile.iverilog [NUM=N]   generate + compile + run (default N=5)"

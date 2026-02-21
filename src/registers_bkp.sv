@@ -1,5 +1,3 @@
-`timescale 1ns / 1ps
-
 module registers(
     input clk,
     input reset_n,

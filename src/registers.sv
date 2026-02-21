@@ -1,5 +1,3 @@
-`timescale 1ns / 1ps
-
 // Pixel-only shift register (weights are now hardcoded in each layer).
 //
 // Loading: 784 bits, raster order, via d_in_p.

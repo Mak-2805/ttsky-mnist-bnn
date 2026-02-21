@@ -21,6 +21,12 @@ project:
     - "pipe.sv"
     - "reset_pipe.sv"
     - "fsm.sv"
+    - "register.sv"
+    - "final_layer_combinational.sv"
+    - "final_layer_sequential.sv"
+    - "flatten_layer.sv"
+    - "layer_two.sv"
+
 
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
 # This section is for the datasheet/website. Use descriptive names (e.g., RX, TX, MOSI, SCL, SEG_A, etc.).

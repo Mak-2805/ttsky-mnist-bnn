@@ -6,7 +6,7 @@ SIM ?= icarus
 FST ?= -fst # Use more efficient FST format
 TOPLEVEL_LANG ?= systemverilog
 SRC_DIR = $(PWD)/../src
-PROJECT_SOURCES = tt_um_mnist_bnn.sv fsm.sv pipe.sv registers.sv reset_pipe.sv
+PROJECT_SOURCES = tt_um_mnist_bnn.sv fsm.sv pipe.sv registers.sv reset_pipe.sv layer_one_try.sv layer_two.sv flatten_layer.sv final_layer_combinational.sv final_layer_sequential.sv
 
 ifneq ($(GATES),yes)
 

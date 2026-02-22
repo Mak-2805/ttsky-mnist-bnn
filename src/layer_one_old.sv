@@ -13,7 +13,11 @@ module layer_one (
     output reg done
 );
     
+    localparam [2:0] s_IDLE    = 3'b000;
+    localparam [2:0] s_LOAD    = 3'b001;
     localparam [2:0] s_LAYER_1 = 3'b010;
+    localparam [2:0] s_LAYER_2 = 3'b011;
+    localparam [2:0] s_LAYER_3 = 3'b100;
 
     reg [4:0] row, col;
     reg [3:0] weight_num;
@@ -51,6 +55,7 @@ module layer_one (
     reg [8:0] conv_result_00, conv_result_01, conv_result_10, conv_result_11;
     reg [3:0] count_00, count_01, count_10, count_11;
     reg [0:7][3:0] thresholds = {4'd6, 4'd5, 4'd5, 4'd6, 4'd8, 4'd8, 4'd8, 4'd6};
+
 
     
     always @(posedge clk or negedge rst_n) begin

@@ -11,7 +11,7 @@ module registers(
     output logic load_done
 );
 
-    localparam s_IDLE = 3'b000, s_LOAD = 3'b001, s_LAYER_1 = 3'b010, s_LAYER_2 = 3'b011, s_LAYER_3 = 3'b100;
+    localparam s_LOAD = 3'b001;
 
     // logic sync_out_pixel, sync_out_weight;
 
@@ -40,7 +40,7 @@ module registers(
             pic_done <= 1'b0;
             row <= 'd0;
             col <= 'd0;
-        end else if (state == s_LOAD && ~pic_done) begin
+        end else if ((state == s_LOAD) && ~pic_done) begin
            pixels[row*28 + col] <= sync_out_pixel;
            if (col < 'd27) begin
                 col <= col + 1;
@@ -67,7 +67,7 @@ module registers(
             bitt <= 'd0;
             trit <= 'd0;
             level <= 'd0;
-        end else if (state == s_LOAD && ~w_done) begin
+        end else if ((state == s_LOAD) && ~w_done) begin
             weights1[trit*24 + bitt*8 + level] <= sync_out_weight;
             if (bitt < 2) begin
             // Still in the same row, move to next bit
@@ -107,7 +107,7 @@ module registers(
             trit1    <= 'd0;
             level1   <= 'd0;
             chan1     <= 'd0;
-        end else if (state == s_LOAD && w_done && ~w_done1) begin
+        end else if ((state == s_LOAD) && w_done && ~w_done1) begin
             weights2[level1*72 + (trit1*3 + bitt1)*8 + chan1] <= sync_out_weight;
             if (chan1 < 7) begin
                 // Next channel
@@ -147,7 +147,7 @@ module registers(
             w_done3    <= 'd0;
             neuron_w3  <= 'd0;
             bit_w3     <= 'd0;
-        end else if (state == s_LOAD && w_done && w_done1 && ~w_done3) begin
+        end else if ((state == s_LOAD) && w_done && w_done1 && ~w_done3) begin
             weights3[neuron_w3*196 + bit_w3] <= sync_out_weight;
             if (bit_w3 < 195) begin
                 // Still in the same neuron row, move to next bit

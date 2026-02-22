@@ -132,7 +132,7 @@ async def test_project(dut):
     #     2 extra rising edges after rst_n goes high.
     # ------------------------------------------------------------------
     dut._log.info("Reset")
-    dut.ena.value    = 1
+    dut.tt_um_mnist_bnn.ena.value    = 1
     dut.ui_in.value  = 0
     dut.uio_in.value = 0
     dut.rst_n.value  = 0

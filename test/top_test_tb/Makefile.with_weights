@@ -1,0 +1,38 @@
+SRC     = ../../src
+LIBDIR  = $(HOME)/lib
+export LD_LIBRARY_PATH := $(LIBDIR):$(LD_LIBRARY_PATH)
+
+.PHONY: all compile run clean help
+
+all: compile run
+
+compile:
+	@echo "Compiling with dynamic weight loading..."
+	iverilog -g2012 -o sim_top.vvp \
+	    tt_um_mnist_bnn_with_weights.v \
+	    $(SRC)/fsm.sv \
+	    $(SRC)/registers_bkp.sv \
+	    $(SRC)/layer_one_bkp.sv \
+	    $(SRC)/layer_two_bkp.sv \
+	    $(SRC)/flatten_layer_bkp.sv \
+	    $(SRC)/pipe.sv \
+	    $(SRC)/reset_pipe.sv \
+	    tb_top.sv
+
+run:
+	@echo "Running simulation..."
+	vvp sim_top.vvp
+
+clean:
+	rm -f sim_top.vvp dumpfile.fst *.mem
+
+help:
+	@echo "Usage:"
+	@echo "  1. Generate test images: python3 gen_real_mnist_images.py [indices...]"
+	@echo "  2. Compile and run: make -f Makefile.with_weights"
+	@echo ""
+	@echo "Targets:"
+	@echo "  make -f Makefile.with_weights all     - compile + run"
+	@echo "  make -f Makefile.with_weights compile - compile only"
+	@echo "  make -f Makefile.with_weights run     - run only"
+	@echo "  make -f Makefile.with_weights clean   - remove generated files"

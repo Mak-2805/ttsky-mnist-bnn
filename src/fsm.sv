@@ -1,84 +1,72 @@
-
 module fsm(
-    input logic clk, // Top level input
-    input logic rst_n, // Top level input
-    input logic mode, // Top level input
-    input logic load_done,
-    input logic layer_1_done,
-    input logic layer_2_done,
-    input logic layer_3_done,
-    output logic [2:0] state
+    input  wire        clk,          // Top level input
+    input  wire        rst_n,        // Top level input
+    input  wire        mode,         // Top level input
+    input  wire        load_done,
+    input  wire        layer_1_done,
+    input  wire        layer_2_done,
+    input  wire        layer_3_done,
+    output reg  [2:0]  state
 );
 
-    localparam s_IDLE    = 3'b000,
-               s_LOAD    = 3'b001,
-               s_LAYER_1 = 3'b010,
-               s_LAYER_2 = 3'b011,
-               s_LAYER_3 = 3'b100;
+    // FSM states
+    localparam s_IDLE     = 3'b000,
+               s_LOAD     = 3'b001,
+               s_LAYER_1  = 3'b010,
+               s_LAYER_2  = 3'b011,
+               s_LAYER_3  = 3'b100;
 
-  	// Current state, Next state
-    logic [2:0] cs, ns;
-    
+    reg [2:0] cs, ns;  // current state, next state
+
+    // -------------------------------
+    // Next state logic (combinational)
+    // -------------------------------
     always @(*) begin
-    	case (cs)
-      	
-        //when we're in idle
-        //only load data when mode is load data and we are not processing 
-      	s_IDLE: begin
-        	if (mode) begin
-          	ns = s_LOAD;
-        	end else begin
-          	ns = cs;
-          end
-        end
-        
-        s_LOAD: begin
-        	if (load_done) begin
-          	ns = s_LAYER_1;
-          end else begin
-          	ns = cs;
-          end
-        end
-        
-        s_LAYER_1: begin
-        	if (layer_1_done) begin
-          	ns = s_LAYER_2;
-          end else begin
-          	ns = cs;
-          end
-        end 
-        
-        s_LAYER_2: begin
-        	if (layer_2_done) begin
-          	ns = s_LAYER_3;
-          end else begin
-          	ns = cs;
-          end
-        end
-        
-        s_LAYER_3: begin
-        	if (layer_3_done) begin
-          	ns = s_IDLE;
-          end else begin
-          	ns = cs;
-          end
-        end
-        
-        default: begin 
-            ns = s_IDLE;
-        end
-      endcase
+        ns = cs; // default to hold current state
+
+        case (cs)
+            s_IDLE: begin
+                if (mode)
+                    ns = s_LOAD;
+            end
+
+            s_LOAD: begin
+                if (load_done)
+                    ns = s_LAYER_1;
+            end
+
+            s_LAYER_1: begin
+                if (layer_1_done)
+                    ns = s_LAYER_2;
+            end
+
+            s_LAYER_2: begin
+                if (layer_2_done)
+                    ns = s_LAYER_3;
+            end
+
+            s_LAYER_3: begin
+                if (layer_3_done)
+                    ns = s_IDLE;
+            end
+
+            default: ns = s_IDLE;
+        endcase
     end
 
-    always @(posedge clk) begin
-        if (!rst_n) begin
-             cs <= s_IDLE;
-        end else begin
-             cs <= ns;
-        end
+    // -------------------------------
+    // State register (sequential)
+    // -------------------------------
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n)
+            cs <= s_IDLE;
+        else
+            cs <= ns;
     end
 
-		assign state = cs;
+    // Output
+    always @(*) begin
+        state = cs;
+    end
 
 endmodule
-

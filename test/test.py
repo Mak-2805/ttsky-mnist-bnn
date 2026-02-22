@@ -7,7 +7,6 @@ from cocotb.triggers import ClockCycles
 
 import os
 import struct
-import numpy as np
 
 # ---------------------------------------------------------------------------
 # Paths to pre-trained weights and binary MNIST data (relative to this file)
@@ -80,20 +79,22 @@ def load_image_and_label(index=0):
 
     with open(img_path, 'rb') as f:
         _magic, _size, rows, cols = struct.unpack('>IIII', f.read(16))
-        raw  = np.frombuffer(f.read(), dtype=np.uint8)
-        bits = np.unpackbits(raw)
-        npix = rows * cols  # 784
-        pixels = bits[index * npix:(index + 1) * npix].tolist()
+        npix = rows * cols  # 784 — must be a multiple of 8
+        nbytes = npix // 8
+        raw = bytearray(f.read())
+        start = index * nbytes
+        img_bytes = raw[start:start + nbytes]
+        # Unpack bits MSB-first (equivalent to np.unpackbits)
+        pixels = [(b >> (7 - i)) & 1 for b in img_bytes for i in range(8)]
 
     label = None
     if os.path.exists(lbl_path):
         try:
             with open(lbl_path, 'rb') as f:
-                hdr = f.read(8)
-                if len(hdr) == 8:
-                    raw_labels = np.frombuffer(f.read(), dtype=np.uint8)
-                    if index < len(raw_labels):
-                        label = int(raw_labels[index])
+                f.read(8)  # skip 8-byte header
+                raw_labels = bytearray(f.read())
+                if index < len(raw_labels):
+                    label = int(raw_labels[index])
         except Exception:
             pass
 

@@ -50,6 +50,7 @@ COMPILE_ARGS		+= -g2012
 
 # Allow sharing configuration between design and testbench via `include`:
 COMPILE_ARGS 		+= -I$(SRC_DIR)
+COMPILE_ARGS		+= -v
 
 # Include the testbench sources:
 VERILOG_SOURCES += $(PWD)/tb.v

@@ -33,7 +33,7 @@ jobs:
       - name: Test Summary
         uses: test-summary/action@v2.3
         with:
-          paths: "."
+          paths: "./results.xml"
         if: always()
 
       - name: upload waveform and test results

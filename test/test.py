@@ -13,8 +13,8 @@ import struct
 # Paths
 # ---------------------------------------------------------------------------
 _HERE        = os.path.dirname(__file__)
-WEIGHTS_DIR  = os.path.join(_HERE, '../../src/Python311_training/weights')
-TRAINING_DIR = os.path.join(_HERE, '../../src/Python311_training/training_data')
+WEIGHTS_DIR  = os.path.join(_HERE, '../src/Python311_training/weights')
+TRAINING_DIR = os.path.join(_HERE, '../src/Python311_training/training_data')
 
 # ---------------------------------------------------------------------------
 # Data loaders

@@ -17,7 +17,7 @@ module final_layer_sequential #(parameter NUM_INPUTS = 196) (
 	output logic layer_3_done
 	);
 
-	localparam s_IDLE = 3'b000, s_LOAD = 3'b001, s_LAYER_1 = 3'b010, s_LAYER_2 = 3'b011, s_LAYER_3 = 3'b100;
+	localparam s_LAYER_3 = 3'b100;
 	logic [7:0] popcount [9:0];
 	logic [7:0] next_popcount [9:0];
 	logic [NUM_INPUTS-1:0] xnor_result [9:0];

@@ -1,7 +1,7 @@
 # Makefile
 # See https://docs.cocotb.org/en/stable/quickstart.html for more info
 
-clean:
+clean::
 #rm -rf build *.vcd *.fst *.xml simulation_results/
 #rm -rf obj_dir *.fst *.vcd *.log
 #rm -f $(VVP) *.fst *.vcd *.log

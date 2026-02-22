@@ -1,26 +1,12 @@
 # Makefile
 # See https://docs.cocotb.org/en/stable/quickstart.html for more info
 
-clean::
-#rm -rf build *.vcd *.fst *.xml simulation_results/
-#rm -rf obj_dir *.fst *.vcd *.log
-#rm -f $(VVP) *.fst *.vcd *.log
-#rm -f $(VVP_SIMPLE) $(VVP_DIGITS) *.fst *.vcd *.log
-#rm -f sim_layer_two.vvp layer_two.vcd tb_layer_two.sv
-#rm -f $(VVP) *.fst *.vcd *.log
-#rm -rf obj_dir *.fst *.vcd *.log
-#rm -rf layer_one_tb/*.vvp*
-#rm -rf layer_two_tb/*.vvp*
-#rm -rf top_test_tb/*.vvp*
-#rm -rf top_test_tb/*.vcd*
-#rm -f top_test_tb/*.mem*
-
 # defaults
 SIM ?= icarus
+FST ?= -fst # Use more efficient FST format
 TOPLEVEL_LANG ?= verilog
 SRC_DIR = $(PWD)/../src
-PROJECT_SOURCES = tt_um_mnist_bnn.v fsm.sv registers.sv layer_one.sv layer_two.sv flatten_layer.sv pipe.sv reset_pipe.sv
-
+PROJECT_SOURCES = tt_um_mnist_bnn.v flatten_layer.sv fsm.sv layer_one.sv layer_two.sv pipe.sv registers.sv reset_pipe.sv
 
 ifneq ($(GATES),yes)
 
@@ -45,12 +31,8 @@ VERILOG_SOURCES += $(PWD)/gate_level_netlist.v
 
 endif
 
-# Enable SystemVerilog (always_ff, always_comb, logic, enum, etc.)
-COMPILE_ARGS		+= -g2012
-
 # Allow sharing configuration between design and testbench via `include`:
 COMPILE_ARGS 		+= -I$(SRC_DIR)
-COMPILE_ARGS		+= -v
 
 # Include the testbench sources:
 VERILOG_SOURCES += $(PWD)/tb.v
@@ -58,7 +40,6 @@ TOPLEVEL = tb
 
 # List test modules to run, separated by commas and without the .py suffix:
 COCOTB_TEST_MODULES = test
-COCOTB_RESULTS_FILE = results.xml
 
 # include cocotb's make rules to take care of the simulator setup
 include $(shell cocotb-config --makefiles)/Makefile.sim

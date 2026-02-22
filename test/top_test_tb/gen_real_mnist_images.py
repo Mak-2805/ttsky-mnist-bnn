@@ -21,6 +21,7 @@ import sys
 # Paths (relative to this script's location)
 # ---------------------------------------------------------------------------
 HERE        = os.path.dirname(os.path.abspath(__file__))
+MNIST_DIR   = os.path.join(HERE, 'MNIST_data_gen')
 DATA_DIR    = os.path.join(HERE, '../../src/Python311_training/training_data')
 WEIGHTS_DIR = os.path.join(HERE, '../../src/Python311_training/weights')
 
@@ -103,7 +104,7 @@ def main():
     if len(sys.argv) > 1:
         indices = [int(x) for x in sys.argv[1:]]
     else:
-        indices = [0, 1]  # Default: test first two images
+        indices = list(range(100))  # Default: test first 100 images
     
     # Load MNIST data
     print(f"Loading MNIST data from {IMAGES_PATH}...")
@@ -143,11 +144,14 @@ def main():
             f.write(f"{idx:X} {labels[idx]:X}\n")  # index and expected label in HEX
     print(f"Written {config_file}")
     
+    # Ensure output directory exists
+    os.makedirs(MNIST_DIR, exist_ok=True)
+
     # Write individual pixel memory files for each image
     for i, idx in enumerate(indices):
         image = images[idx]
         label = labels[idx]
-        
+
         # Print ASCII preview
         print(f"\nTest image {i}: MNIST index {idx}, label={label}")
         print("Image preview (# = white, . = black):")
@@ -155,13 +159,13 @@ def main():
         for row in image:
             print("|" + "".join("#" if p else "." for p in row) + "|")
         print("+" + "-"*28 + "+")
-        
+
         # Flatten to bit stream (row-major order)
         pixel_bits = image.flatten().tolist()
         assert len(pixel_bits) == 784, f"Expected 784 pixels, got {len(pixel_bits)}"
-        
-        # Write pixels_N.mem file
-        pixel_file = os.path.join(HERE, f'pixels_{i}.mem')
+
+        # Write pixels_N.mem file into MNIST_data_gen/
+        pixel_file = os.path.join(MNIST_DIR, f'pixels_{i}.mem')
         with open(pixel_file, 'w') as f:
             for b in pixel_bits:
                 f.write(f"{b}\n")

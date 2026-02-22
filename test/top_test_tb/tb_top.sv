@@ -54,7 +54,7 @@ reg weight_stream [0:2319];   // 2320 weight bits (w1+w2+w3)
 // Test configuration
 // ---------------------------------------------------------------------------
 reg [31:0] num_tests;
-reg [31:0] test_indices [0:99];    // Support up to 100 test images
+reg [31:0] test_indices [0:200];   // 1 count + 100 tests x 2 (index, label) = 201 entries
 reg [7:0]  expected_labels [0:99];
 
 // ---------------------------------------------------------------------------
@@ -66,6 +66,10 @@ reg [31:0] current_index;
 reg [7:0]  current_label;
 reg [3:0]  hw_result;
 string pixel_filename;
+
+// Pass/fail tracking (store MNIST dataset index for each outcome)
+reg [31:0] passed_mnist_idx [0:99];
+reg [31:0] failed_mnist_idx [0:99];
 
 // ---------------------------------------------------------------------------
 // Main test
@@ -107,7 +111,7 @@ initial begin
         $display("========================================================================");
         
         // Load pixel data for this test image
-        $sformat(pixel_filename, "pixels_%0d.mem", test_num);
+        $sformat(pixel_filename, "MNIST_data_gen/pixels_%0d.mem", test_num);
         $readmemb(pixel_filename, pixel_stream);
         
         // Print input image
@@ -166,10 +170,12 @@ initial begin
         if (hw_result == current_label) begin
             $display("  Result: PASS");
             $display("LOG: %0t : INFO : tb_top : dut.uo_out[3:0] : expected_value: %0d actual_value: %0d", $time, current_label, hw_result);
+            passed_mnist_idx[passed_tests] = test_indices[test_num*2 + 1];
             passed_tests = passed_tests + 1;
         end else begin
             $display("  Result: FAIL");
             $display("LOG: %0t : ERROR : tb_top : dut.uo_out[3:0] : expected_value: %0d actual_value: %0d", $time, current_label, hw_result);
+            failed_mnist_idx[failed_tests] = test_indices[test_num*2 + 1];
             failed_tests = failed_tests + 1;
         end
         $display("---------------------------------------------------------------------");
@@ -190,8 +196,24 @@ initial begin
     $display("Passed:       %0d", passed_tests);
     $display("Failed:       %0d", failed_tests);
     $display("Success rate: %0d%%", (passed_tests * 100) / num_tests);
+    $display("------------------------------------------------------------------------");
+
+    $write("PASSED images (MNIST indices): ");
+    for (i = 0; i < passed_tests; i = i + 1) begin
+        if (i > 0) $write(", ");
+        $write("%0d", passed_mnist_idx[i]);
+    end
+    $display("");
+
+    $write("FAILED images (MNIST indices): ");
+    for (i = 0; i < failed_tests; i = i + 1) begin
+        if (i > 0) $write(", ");
+        $write("%0d", failed_mnist_idx[i]);
+    end
+    $display("");
+
     $display("========================================================================");
-    
+
     if (failed_tests == 0) begin
         $display("TEST PASSED");
     end else begin

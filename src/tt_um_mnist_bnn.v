@@ -110,7 +110,8 @@ module tt_um_mnist_bnn (
 
   final_layer_sequential u3 (
     .clock(clk),
-	  .reset(synchronous_reset),
+    // CHANGE TO SYNCHRONOUS RESET
+	  .reset(reset_n),
     .state(state),
 	  .data_in(layer_2_out),
 	  .weights_in(weights3),

@@ -83,7 +83,7 @@ module layer_two (
         input [3:0] wn, r, c;
         integer tmp;
         begin
-            tmp     = wn * 49 + r * 7 + c;
+            tmp     <= wn * 49 + r * 7 + c;
             out_idx = tmp[7:0];
         end
     endfunction

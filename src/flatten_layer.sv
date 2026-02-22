@@ -34,6 +34,8 @@ module final_layer_sequential #(parameter NUM_INPUTS = 196) (
 		end
 	end
 
+// CONVERT TO SYNCHRONOUS RESET
+
 	always @(posedge clock or negedge reset) begin
 		if (!reset) begin
 			for (int i = 0; i < 10; i++) begin

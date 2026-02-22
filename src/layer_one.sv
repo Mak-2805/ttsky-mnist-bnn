@@ -13,11 +13,6 @@ module layer_one (
     output reg done
 );
     
-    localparam [2:0] s_IDLE    = 3'b000;
-    localparam [2:0] s_LOAD    = 3'b001;
-    localparam [2:0] s_LAYER_1 = 3'b010;
-    localparam [2:0] s_LAYER_2 = 3'b011;
-    localparam [2:0] s_LAYER_3 = 3'b100;
 
     reg [4:0] row, col;
     reg [3:0] weight_num;
@@ -59,7 +54,7 @@ module layer_one (
             weight_num <= 0;
         end
         else begin
-            if (state == s_LAYER_1) begin
+            if (state == 3'b010) begin
                 if (weight_num < 8) begin
                     if (col < 13) begin
                         col <= col + 1;

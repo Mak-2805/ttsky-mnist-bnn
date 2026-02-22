@@ -123,6 +123,6 @@ module tt_um_mnist_bnn (
   //Michael will try to cook this up
     
   // List all unused inputs to prevent warnings
-  wire _unused = &{ena,ui_in[7:3], 1'b0};
+  wire _unused = &{ena,ui_in[7:3],uio_in,1'b0};
 
 endmodule

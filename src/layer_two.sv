@@ -83,7 +83,7 @@ module layer_two (
         input [3:0] wn, r, c;
         integer tmp;
         begin
-            tmp     = wn * 49 + r * 7 + c;
+            tmp     <= wn * 49 + r * 7 + c;
             out_idx = tmp[7:0];
         end
     endfunction
@@ -181,18 +181,26 @@ module layer_two (
     reg [71:0] cr00, cr01, cr10, cr11;
     reg [6:0]  thresh;
 
-    always @(*) begin
-        thresh = get_threshold(weight_num);
-        cr00   = conv(row << 1,         col << 1,       weight_num);
-        cr01   = conv(row << 1,       (col << 1) + 1,   weight_num);
-        cr10   = conv((row << 1) + 1,   col << 1,       weight_num);
-        cr11   = conv((row << 1) + 1, (col << 1) + 1,   weight_num);
+    always @ (posedge clk) begin
+        if (rst_n) begin
+            thresh <= 7'd0;
+            cr00 <= 72'd0;
+            cr01 <= 72'd0;
+            cr10 <= 72'd0;
+            cr11 <= 72'd0;
+        end else begin 
+            thresh <= get_threshold(weight_num);
+            cr00   <= conv(row << 1,         col << 1,       weight_num);
+            cr01   <= conv(row << 1,       (col << 1) + 1,   weight_num);
+            cr10   <= conv((row << 1) + 1,   col << 1,       weight_num);
+            cr11   <= conv((row << 1) + 1, (col << 1) + 1,   weight_num);
 
-        layer_two_out[out_idx(weight_num, row, col)] =
-            ((count_ones72(cr00) >= thresh) |
-             (count_ones72(cr01) >= thresh) |
-             (count_ones72(cr10) >= thresh) |
-             (count_ones72(cr11) >= thresh));
+            layer_two_out[out_idx(weight_num, row, col)] <=
+                ((count_ones72(cr00) >= thresh) |
+                (count_ones72(cr01) >= thresh) |
+                (count_ones72(cr10) >= thresh) |
+                (count_ones72(cr11) >= thresh));
+        end
     end
 
 endmodule

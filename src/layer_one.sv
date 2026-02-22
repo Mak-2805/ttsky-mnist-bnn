@@ -92,21 +92,34 @@ module layer_one (
     reg [3:0] count_00, count_01, count_10, count_11;
     reg [3:0] threshold;
 
-    always @(*) begin
-        threshold = 5 + (weight_num & 4'b1);
-        conv_result_00 = conv(row << 1, col << 1, weight_num);
-        conv_result_01 = conv(row << 1, (col << 1) + 1, weight_num);
-        conv_result_10 = conv((row << 1) + 1, col << 1, weight_num);
-        conv_result_11 = conv((row << 1) + 1, (col << 1) + 1, weight_num);
+    always @(posedge clk) begin
+        if (rst_n) begin
+            threshold <= 4'd0;
+            count_00 <= 4'd0;
+            count_01 <= 4'd0;
+            count_10 <= 4'd0;
+            count_11 <= 4'd0;
+            conv_result_00 <= 9'd0;
+            conv_result_01 <= 9'd0;
+            conv_result_10 <= 9'd0;
+            conv_result_11 <= 9'd0;
+        end else begin
+            threshold <= 5 + (weight_num & 4'b1);
+            conv_result_00 <= conv(row << 1, col << 1, weight_num);
+            conv_result_01 <= conv(row << 1, (col << 1) + 1, weight_num);
+            conv_result_10 <= conv((row << 1) + 1, col << 1, weight_num);
+            conv_result_11 <= conv((row << 1) + 1, (col << 1) + 1, weight_num);
 
-        count_00 = count_ones(conv_result_00);
-        count_01 = count_ones(conv_result_01);
-        count_10 = count_ones(conv_result_10);
-        count_11 = count_ones(conv_result_11);
+            count_00 <= count_ones(conv_result_00);
+            count_01 <= count_ones(conv_result_01);
+            count_10 <= count_ones(conv_result_10);
+            count_11 <= count_ones(conv_result_11);
 
-        layer_one_out[out_idx(weight_num, row, col)] =
-            ((count_00 >= threshold) | (count_01 >= threshold) |
-             (count_10 >= threshold) | (count_11 >= threshold));
+            layer_one_out[out_idx(weight_num, row, col)] <=
+                ((count_00 >= threshold) | (count_01 >= threshold) |
+                (count_10 >= threshold) | (count_11 >= threshold));
+        end
+        
     end
 
 

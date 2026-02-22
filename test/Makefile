@@ -18,7 +18,7 @@ clean::
 # defaults
 SIM ?= icarus
 TOPLEVEL_LANG ?= verilog
-SRC_DIR = $(PWD)/../../src
+SRC_DIR = $(PWD)/../src
 PROJECT_SOURCES = tt_um_mnist_bnn.v fsm.sv registers.sv layer_one.sv layer_two.sv flatten_layer.sv pipe.sv reset_pipe.sv
 
 

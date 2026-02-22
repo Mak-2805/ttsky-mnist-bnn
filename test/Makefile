@@ -11,8 +11,8 @@ clean::
 #rm -rf obj_dir *.fst *.vcd *.log
 	rm -rf layer_one_tb/*.vvp*
 	rm -rf layer_two_tb/*.vvp*
-	rm -f top_test_tb/*.vvp*
-	rm -f top_test_tb/*.vcd*
+	rm -rf top_test_tb/*.vvp*
+	rm -rf top_test_tb/*.vcd*
 #rm -f top_test_tb/*.mem*
 
 # defaults
